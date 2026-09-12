@@ -1,10 +1,8 @@
 // Pick Em client-side logic: who's picking, their picks, lock-in submission.
-// ponytail: no backend yet — submit() posts to a placeholder endpoint and
-// fails gracefully. Wire this up once the Python side exists.
 
 (function () {
   var STORAGE_KEY = 'pickem_user';
-  var SUBMIT_URL = 'submit-picks.py'; // placeholder — doesn't exist yet
+  var SUBMIT_URL = '/cgi-bin/submit-picks.py';
 
   var rows = document.querySelectorAll('.pickem-row');
   var heading = document.getElementById('pickem-heading');
@@ -87,8 +85,8 @@
       return;
     }
 
-    var payload = { user: selectedUser, picks: picks };
-    console.log('Pick Em submission (client-side only for now):', payload);
+    var week = parseInt(fixtureGrid.dataset.week, 10);
+    var payload = { user: selectedUser, week: week, picks: picks };
 
     locked = true;
     render();
@@ -99,11 +97,13 @@
 
     submitPicks(payload)
       .then(function (res) {
-        if (!res.ok) throw new Error('server responded ' + res.status);
-        status.textContent = 'Picks locked in and saved for ' + selectedUser + '.';
+        return res.json().then(function (body) {
+          if (!res.ok || !body.ok) throw new Error(body.error || ('server responded ' + res.status));
+          status.textContent = 'Picks locked in and saved for ' + selectedUser + '.';
+        });
       })
-      .catch(function () {
-        status.textContent = 'Picks locked in for ' + selectedUser + ' (saved locally — server sync isn’t wired up yet).';
+      .catch(function (err) {
+        status.textContent = 'Picks locked in for ' + selectedUser + ', but saving to the server failed (' + err.message + ').';
       });
   });
 
