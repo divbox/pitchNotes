@@ -146,13 +146,31 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
 @media (max-width: 480px) {
   .next-up-grid { grid-template-columns: 1fr; }
 }
+
+.masthead .kicker { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pickem-link { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-accent); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; background: none; border: none; cursor: pointer; padding: 0; }
+.pickem-link:hover { text-decoration: underline; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(3, 7, 18, 0.75); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal-panel { position: relative; width: 100%; max-width: 720px; max-height: 85vh; overflow-y: auto; background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 28px 24px; }
+.modal-close { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-secondary); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px; }
+.modal-close:hover { color: var(--text-primary); }
+.pickem-heading { font-family: var(--font-display); font-weight: 800; font-size: 28px; text-align: center; margin: 0 0 16px; letter-spacing: 0.01em; }
+.pickem-row { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-subtle); margin-bottom: 12px; }
+.pickem-row:last-child { margin-bottom: 0; }
+.pickem-avatar { width: 200px; height: 140px; border-radius: 10px; object-fit: cover; object-position: center top; border: 1px solid var(--border-strong); flex-shrink: 0; }
+.pickem-name-wrap { width: 100px; flex-shrink: 0; }
+.pickem-name { display: inline-block; font-family: var(--font-display); font-weight: 700; font-size: 26px; border-bottom: 2px solid var(--color-accent); padding-bottom: 2px; white-space: nowrap; }
+.pickem-divider { align-self: stretch; width: 2px; background: var(--color-accent); flex-shrink: 0; }
+.pickem-fill { flex: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 500; color: var(--color-accent); }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="masthead">
-    <p class="kicker">Week 3 &middot; Premier League 2026/27</p>
+    <p class="kicker"><span>Week 3 &middot; Premier League 2026/27</span><button type="button" class="pickem-link" id="pickem-open">Pick Em</button></p>
     <h1>PITCH NOTES<span>.</span></h1>
     <div class="meta">
       <span>10 September 2026 &middot; recap of the weekend just played</span>
@@ -358,5 +376,50 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
   </footer>
 
 </div>
+
+  <div class="modal-overlay" id="pickem-modal">
+    <div class="modal-panel">
+      <button type="button" class="modal-close" id="pickem-close" aria-label="Close">&times;</button>
+      <h2 class="pickem-heading">Standings</h2>
+      <div class="pickem-row">
+        <img class="pickem-avatar" src="../images/divs.jpg" alt="Divs">
+        <div class="pickem-name-wrap"><span class="pickem-name">Divs</span></div>
+        <span class="pickem-divider"></span>
+        <span class="pickem-fill">7W &ndash; 3L</span>
+      </div>
+      <div class="pickem-row">
+        <img class="pickem-avatar" src="../images/cheeky.jpg" alt="Cheeky">
+        <div class="pickem-name-wrap"><span class="pickem-name">Cheeky</span></div>
+        <span class="pickem-divider"></span>
+        <span class="pickem-fill">6W &ndash; 4L</span>
+      </div>
+      <div class="pickem-row">
+        <img class="pickem-avatar" src="../images/ll.jpg" alt="LL">
+        <div class="pickem-name-wrap"><span class="pickem-name">LL</span></div>
+        <span class="pickem-divider"></span>
+        <span class="pickem-fill">5W &ndash; 5L</span>
+      </div>
+      <div class="pickem-row">
+        <img class="pickem-avatar" src="../images/ldog.jpg" alt="L-Dog">
+        <div class="pickem-name-wrap"><span class="pickem-name">L-Dog</span></div>
+        <span class="pickem-divider"></span>
+        <span class="pickem-fill">4W &ndash; 6L</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    var openBtn = document.getElementById('pickem-open');
+    var closeBtn = document.getElementById('pickem-close');
+    var overlay = document.getElementById('pickem-modal');
+    function open() { overlay.classList.add('open'); }
+    function close() { overlay.classList.remove('open'); }
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+  })();
+  </script>
 </body>
 </html>
