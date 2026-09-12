@@ -1,0 +1,55 @@
+# Pitch Notes
+
+A weekly, self-hosted Premier League dashboard — a single self-contained HTML
+file covering Arsenal and Manchester United, built for a small group of
+friends. See [CLAUDE.md](CLAUDE.md) for the full project brief and
+[DESIGN.md](DESIGN.md) for the visual design system.
+
+## Layout
+
+```
+scripts/     pipeline scripts (see below)
+weeklies/    generated weekly HTML files (pitch-notes-W<N>.html)
+dist/        the promoted "live" site (index.html + archive/), rsynced to the host
+logs/        pipeline run log
+manifest.json  tracks which week is currently live
+odds.json      local test output of fetch_odds.py (the real one runs on the host)
+```
+
+## Pipeline
+
+Two steps, run from the project root:
+
+1. **Write this week's content** — hand-edit `scripts/content.py` (or run the
+   `pitch-notes-content` skill). Research and judgment live here.
+2. **Build and publish**:
+   ```bash
+   python3 scripts/run_weekly.py
+   ```
+   Chains `build.py` (renders `content.py` + live standings/fixtures from
+   football-data.org into HTML) → `publish.py` (promotes the newest
+   `weeklies/` file to `dist/index.html`, archives the outgoing week) →
+   `deploy.py` (rsyncs `dist/` to the Linode host). Stops at the first
+   failing step and logs to `logs/pitch-notes.log`.
+
+All scripts read paths relative to the project root, so always run them from
+there.
+
+### Odds
+
+`scripts/fetch_odds.py` is a separate, independent pipeline — the real one
+runs on a cron job on the Linode host (not from this repo). See CLAUDE.md's
+Pipeline section for details.
+
+## Setup
+
+Requires a `.env` file in the project root with:
+
+```
+FOOTBALL_DATA_API_KEY=
+ODDS_API_KEY=
+LINODE_HOST=
+LINODE_USER=
+LINODE_PORT=
+LINODE_WWW_PATH=
+```

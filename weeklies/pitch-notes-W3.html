@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitch Notes — Week 3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-display: 'Big Shoulders Display', system-ui, sans-serif;
+  --font-serif:   'Source Serif 4', Georgia, serif;
+  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+
+  --color-accent:        #ef0107;
+  --color-accent-bg:     #2a0a08;
+  --color-accent-text:   #ff4d43;
+  --color-gold:          #d4a94e;
+
+  --surface-page:        #060d18;
+  --surface-card:        #0a1628;
+  --surface-subtle:      #101f36;
+
+  --text-primary:        #f1ede2;
+  --text-secondary:      #b8b2a3;
+  --text-muted:          #7a7568;
+
+  --border:              #1c2d47;
+  --border-strong:       #2a3f5c;
+
+  --color-success:       #16a34a;
+  --color-success-bg:    #0d2618;
+  --color-success-text:  #4ade80;
+
+  --color-warning:       #ea580c;
+  --color-warning-bg:    #2b1608;
+  --color-warning-text:  #fb923c;
+
+  --color-danger:        #dc2626;
+  --color-danger-bg:     #2a0d0d;
+  --color-danger-text:   #f87171;
+
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 16px;
+  --text-lg:   18px;
+  --text-xl:   22px;
+
+  --radius:    8px;
+  --radius-lg: 12px;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: 1.55;
+}
+.wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }
+
+.masthead { padding: 8px 0 24px; border-bottom: 3px solid var(--color-accent); margin-bottom: 32px; }
+.masthead .kicker { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-gold); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 10px; }
+.masthead h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(38px, 9vw, 56px); line-height: 0.95; margin: 0 0 12px; letter-spacing: 0.01em; }
+.masthead h1 span { color: var(--color-accent); }
+.masthead .meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-secondary); }
+.masthead .meta strong { color: var(--text-primary); font-weight: 600; }
+.masthead .archive-link { color: var(--color-accent-text); text-decoration: none; }
+.masthead .archive-link:hover { text-decoration: underline; }
+
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 40px 0 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.sec-head .tag { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500; color: var(--color-accent); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.sec-head h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); margin: 0; color: var(--text-primary); }
+
+.card { background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+
+.hero { border-left: 4px solid var(--color-accent); }
+.hero .headline { font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0 0 8px; }
+.hero p { margin: 0 0 8px; color: var(--text-secondary); }
+.hero p:last-child { margin-bottom: 0; }
+
+.schedule-note { display: flex; gap: 12px; align-items: flex-start; }
+.schedule-note .icon { font-family: var(--font-mono); color: var(--color-warning-text); background: var(--color-warning-bg); border-radius: 4px; padding: 2px 6px; font-size: var(--text-xs); flex-shrink: 0; }
+
+table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+thead th { text-align: left; color: var(--text-muted); font-weight: 500; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 8px 8px; border-bottom: 1px solid var(--border-strong); }
+tbody td { padding: 9px 8px; border-bottom: 0.5px solid var(--border); }
+tbody tr.followed { background: var(--surface-subtle); }
+tbody tr.followed td:first-child { box-shadow: inset 3px 0 0 var(--color-accent); }
+.chip { display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 2px 5px; border-radius: 4px; margin-right: 4px; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.stat-col { background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 6px; }
+.stat-col h3 { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 12px; color: var(--color-gold); }
+.stat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-top: 0.5px solid var(--border); font-size: var(--text-sm); }
+.stat-row:first-of-type { border-top: none; }
+.stat-row.followed { box-shadow: inset 3px 0 0 var(--color-accent); padding-left: 6px; }
+.stat-row .note { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+
+.movers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mover-col { background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 6px; }
+.mover-col h3 { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 12px; }
+.mover-col.up h3 { color: var(--color-success-text); }
+.mover-col.down h3 { color: var(--color-danger-text); }
+.mover-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-top: 0.5px solid var(--border); font-size: var(--text-sm); }
+.mover-row:first-of-type { border-top: none; }
+.mover-row.followed { box-shadow: inset 3px 0 0 var(--color-accent); padding-left: 6px; }
+.mover-row .note { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
+.movers-note { color: var(--text-secondary); font-size: var(--text-sm); margin-top: 12px; }
+@media (max-width: 480px) { .movers-grid { grid-template-columns: 1fr; } }
+
+.club-news h3 { font-family: var(--font-display); font-size: var(--text-lg); margin: 0 0 6px; }
+.club-news p { color: var(--text-secondary); margin: 0 0 14px; }
+.club-news .club-block:last-child p { margin-bottom: 0; }
+
+.wire-item { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.wire-item:last-child { border-bottom: none; padding-bottom: 0; }
+.wire-item p { margin: 4px 0 0; color: var(--text-secondary); font-size: var(--text-sm); }
+.grade { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500; padding: 2px 8px; border-radius: 4px; white-space: nowrap; height: fit-content; }
+.grade.speculative { color: var(--text-muted); border: 1px solid var(--border-strong); }
+.grade.likely { color: var(--color-warning-text); background: var(--color-warning-bg); }
+.grade.confirmed { color: var(--color-success-text); background: var(--color-success-bg); }
+.window-note { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); margin: 0 0 16px; }
+
+.divbox101 p { color: var(--text-secondary); }
+.divbox101 ul { color: var(--text-secondary); padding-left: 20px; }
+
+.next-up-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-card { background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; }
+.stat-label { font-size: var(--text-xs); color: var(--text-muted); font-weight: 500; margin-bottom: 4px; font-family: var(--font-mono); }
+.stat-value { font-size: var(--text-base); font-weight: 500; color: var(--text-primary); }
+.fixture-time { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-secondary); margin-top: 4px; }
+
+.odds-row { padding: 10px 0; border-top: 0.5px solid var(--border); }
+.odds-row:first-child { border-top: none; padding-top: 0; }
+.odds-match { font-size: var(--text-sm); color: var(--text-primary); margin-bottom: 4px; }
+.odds-prices { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.odds-note { font-size: var(--text-xs); color: var(--text-muted); margin: 10px 0 0; }
+.odds-note a { color: var(--text-muted); }
+
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
+
+@media (max-width: 480px) {
+  .next-up-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">Week 3 &middot; Premier League 2026/27</p>
+    <h1>PITCH NOTES<span>.</span></h1>
+    <div class="meta">
+      <span>10 September 2026 &middot; recap of the weekend just played</span>
+      <span>&middot;</span>
+      <span>Following <strong>Arsenal</strong> &amp; <strong>Man United</strong></span>
+      <span>&middot;</span>
+      <a class="archive-link" href="archive/">Archive</a>
+    </div>
+  </header>
+
+  <section class="hero card">
+    <p class="headline">Both clubs win in Europe</p><p>Arsenal opened their Champions League campaign with a 1-0 win at Napoli on Wednesday, Martin Odegaard settling it with a low finish from the edge of the box after a quick one-two with substitute Christos Tzolis. It was his fourth goal in five games, and Arsenal fired 26 shots at goal, their most in a single Champions League match since 2003-04, though a tidier side would have won by more.</p><p>Man United's return to the competition went even better. Goals from Matheus Cunha, Bruno Fernandes and Benjamin Sesko inside the first 45 minutes put Sabah FK away before Lisandro Martinez added a fourth after the break, a 4-0 win in Michael Carrick's first Champions League game in charge. It's over 1,000 days since United last played in this competition.</p>
+  </section>
+
+  <div class="sec-head"><h2>Normal service resumes this weekend</h2><span class="tag">Schedule Watch</span></div>
+  <div class="card schedule-note">
+    <span class="icon">PL</span>
+    <p style="margin:0; color: var(--text-secondary);">No fixture gap to explain this time. After Champions League commitments in midweek, both clubs are back to the regular Saturday/Sunday rhythm: Sunderland host Arsenal on the 12th, and Manchester United welcome Manchester City to Old Trafford on the 13th.</p>
+  </div>
+
+  <div class="sec-head"><h2>Top six, plus the ones we actually care about</h2><span class="tag">The Table</span></div>
+  <table>
+    <thead><tr><th>Pos</th><th>Club</th><th>P</th><th>W-D-L</th><th>GD</th><th>Pts</th></tr></thead>
+    <tbody>
+        <tr>
+          <td>1</td>
+          <td><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</td>
+          <td>3</td>
+          <td>3-0-0</td>
+          <td>+5</td>
+          <td><strong>9</strong></td>
+        </tr>
+        <tr class="followed">
+          <td>2</td>
+          <td><span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Arsenal</td>
+          <td>3</td>
+          <td>3-0-0</td>
+          <td>+5</td>
+          <td><strong>9</strong></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><span class="chip" style="background:#F5A623;color:#0a1628">HUL</span> Hull City</td>
+          <td>3</td>
+          <td>2-1-0</td>
+          <td>+3</td>
+          <td><strong>7</strong></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Chelsea</td>
+          <td>3</td>
+          <td>2-0-1</td>
+          <td>+1</td>
+          <td><strong>6</strong></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><span class="chip" style="background:#E30613;color:#f1ede2">BRE</span> Brentford</td>
+          <td>3</td>
+          <td>1-2-0</td>
+          <td>+3</td>
+          <td><strong>5</strong></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><span class="chip" style="background:#C8102E;color:#f1ede2">LIV</span> Liverpool</td>
+          <td>3</td>
+          <td>1-2-0</td>
+          <td>+2</td>
+          <td><strong>5</strong></td>
+        </tr>
+        <tr class="followed">
+          <td>11</td>
+          <td><span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Man United</td>
+          <td>3</td>
+          <td>1-1-1</td>
+          <td>+1</td>
+          <td><strong>4</strong></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <div class="sec-head"><h2>Who's doing the business</h2><span class="tag">Golden Boot Watch</span></div>
+  <div class="stats-grid">
+    <div class="stat-col">
+      <h3>Top scorers</h3>
+      <div class="stat-row"><span>1. <span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Erling Haaland</span><span class="note">3</span></div><div class="stat-row"><span>2. <span class="chip" style="background:#C8102E;color:#f1ede2">LIV</span> Alexander Isak</span><span class="note">3</span></div><div class="stat-row followed"><span>3. <span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Bruno Fernandes</span><span class="note">3</span></div><div class="stat-row followed"><span>4. <span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Kai Havertz</span><span class="note">2</span></div><div class="stat-row followed"><span>5. <span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Bukayo Saka</span><span class="note">2</span></div>
+    </div>
+    <div class="stat-col">
+      <h3>Top assists</h3>
+      <div class="stat-row"><span>1. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> João Pedro</span><span class="note">2</span></div><div class="stat-row"><span>2. <span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Rayan Cherki</span><span class="note">2</span></div><div class="stat-row followed"><span>3. <span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Bruno Fernandes</span><span class="note">1</span></div><div class="stat-row"><span>4. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Morgan Rogers</span><span class="note">1</span></div><div class="stat-row"><span>5. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Cole Palmer</span><span class="note">1</span></div>
+    </div>
+  </div>
+  <p class="movers-note">Assists are drawn from players who've scored at least once this season. The free data source doesn't publish a separate assists-only leaderboard, so a pure creator with zero goals wouldn't show up here.</p>
+
+  <div class="sec-head"><h2>Early Risers &amp; Strugglers</h2><span class="tag">Form, not rank</span></div>
+  <div class="movers-grid">
+    <div class="mover-col up">
+      <h3>&uarr; Best start</h3>
+      <div class="mover-row"><span><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</span><span class="note">3W-0D-0L</span></div><div class="mover-row class="followed""><span><span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Arsenal</span><span class="note">3W-0D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#F5A623;color:#0a1628">HUL</span> Hull City</span><span class="note">2W-1D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Chelsea</span><span class="note">2W-0D-1L</span></div>
+    </div>
+    <div class="mover-col down">
+      <h3>&darr; Toughest start</h3>
+      <div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">AVL</span> Aston Villa</span><span class="note">0W-1D-2L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">TOT</span> Tottenham</span><span class="note">0W-1D-2L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">FUL</span> Fulham</span><span class="note">0W-0D-3L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">COV</span> Coventry City</span><span class="note">0W-0D-3L</span></div>
+    </div>
+  </div>
+  <p class="movers-note">Ranked on current record, not week-over-week movement. Arsenal and Man United only show up here when their form actually puts them in the top or bottom four. Otherwise, check The Table above for where they sit.</p>
+
+  <div class="sec-head"><h2>Arsenal &amp; Man United</h2><span class="tag">Club News</span></div>
+  <div class="card club-news">
+    <div class="club-block">
+      <h3><span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Arsenal</h3>
+      <p>A professional away win at Napoli, even if the scoreline undersold the dominance. Odegaard's strike was the difference, and Arteta's side fired more shots than in any Champions League game in over two decades. The finishing needs work before the knockout rounds matter, but three points on the road in Europe is three points on the road in Europe.</p>
+    </div>
+    <div class="club-block">
+      <h3><span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Man United</h3>
+      <p>A statement return to the Champions League. Cunha, Fernandes and Sesko did the damage inside the first half, Martinez added a fourth, and Carrick got his European bow at Old Trafford out of the way in style. Now it's straight back to league business against the club at the top of the table.</p>
+    </div>
+  </div>
+
+  <div class="sec-head"><h2>The rumour mill</h2><span class="tag">Transfer Wire</span></div>
+  <p class="window-note">Summer window closed 23:00 BST, 1 September. Everything below is January-window chatter, so treat it accordingly.</p>
+  <div class="card">
+    <div class="wire-item">
+      <div><strong>Arsenal &rarr; Andria Bartishvili (unattached Georgian midfielder)</strong><p>Fabrizio Romano reports Arsenal are set to sign the teenage midfielder, which puts this a notch above the usual January noise.</p></div>
+      <span class="grade likely">Likely</span>
+    </div>
+    <div class="wire-item">
+      <div><strong>Arsenal &amp; Man United &rarr; Pio Esposito (Inter Milan)</strong><p>Both clubs are credited with interest in the Inter striker, valued at around £73m. Nothing here yet beyond shared interest, and a straight run at each other for the same player rarely resolves quickly.</p></div>
+      <span class="grade speculative">Speculative</span>
+    </div>
+    <div class="wire-item">
+      <div><strong>Man United &rarr; Lewis Hall (Newcastle)</strong><p>United have made an approach after failing to get him out of Newcastle before. An inquiry is a step up from pure speculation, but it's not a here-we-go yet.</p></div>
+      <span class="grade speculative">Speculative</span>
+    </div>
+  </div>
+
+  <div class="sec-head"><h2>Why an away goal isn't worth extra anymore</h2><span class="tag">Divbox 101</span></div>
+  <div class="card divbox101">
+    <p>Older fans will remember the away goals rule: if a two-legged tie finished level on aggregate, the team that scored more goals away from home went through, sometimes even after extra time. UEFA scrapped it in 2021, reasoning that the pitch and travel disadvantages it was designed to offset had mostly disappeared.</p>
+    <p>So Arsenal's 1-0 at Napoli is worth exactly what it looks like: three points and a goal, nothing more, nothing tactically encoded into it the way it would have been a few years ago. Under the current Champions League league-phase format there's no two-legged tie to speak of anyway until the knockout rounds start in 2027, so the rule wouldn't apply here regardless. Still worth knowing before someone at the pub tells you an away win in Europe "counts double."</p>
+    
+  </div>
+
+  <div class="sec-head"><h2>What's coming</h2><span class="tag">Next Up</span></div>
+  <div class="next-up-grid">
+    <div class="stat-card fixture-card">
+      <div class="stat-label">Premier League &middot; A</div>
+      <div class="stat-value"><span class="chip" style="background:#EB172F;color:#f1ede2">SUN</span> Sunderland</div>
+      <div class="fixture-time">Sat 12 Sep, 19:00 UTC</div>
+    </div>
+    <div class="stat-card fixture-card">
+      <div class="stat-label">Premier League &middot; A</div>
+      <div class="stat-value"><span class="chip" style="background:#4a5568;color:#f1ede2">BHA</span> Brighton Hove</div>
+      <div class="fixture-time">Sat 19 Sep, 14:00 UTC</div>
+    </div>
+    <div class="stat-card fixture-card">
+      <div class="stat-label">Premier League &middot; H</div>
+      <div class="stat-value"><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</div>
+      <div class="fixture-time">Sun 13 Sep, 15:30 UTC</div>
+    </div>
+    <div class="stat-card fixture-card">
+      <div class="stat-label">Premier League &middot; A</div>
+      <div class="stat-value"><span class="chip" style="background:#4a5568;color:#f1ede2">FUL</span> Fulham</div>
+      <div class="fixture-time">Sun 20 Sep, 15:30 UTC</div>
+    </div>
+  </div>
+
+  <div class="sec-head"><h2>Who the bookies fancy</h2><span class="tag">The Odds</span></div>
+  <div class="card" id="odds-card">
+    <p style="margin:0; color: var(--text-muted); font-size: var(--text-sm);">Loading odds&hellip;</p>
+  </div>
+  <p class="odds-note">Bookmaker average, refreshed a few times a day. Not live, so lines will have moved by kickoff, and it's for fun, not financial advice. <a href="https://www.begambleaware.org" target="_blank" rel="noopener">BeGambleAware.org</a></p>
+  <script>
+  (function() {
+    var el = document.getElementById('odds-card');
+    fetch('odds.json').then(function(r) {
+      if (!r.ok) throw new Error('no odds file');
+      return r.json();
+    }).then(function(data) {
+      var order = ['ARS', 'MUN'];
+      var html = '';
+      order.forEach(function(tla) {
+        var d = data[tla];
+        if (!d) return;
+        var prices = Object.keys(d.odds).map(function(name) {
+          return name + ' ' + d.odds[name].toFixed(2);
+        }).join(' &middot; ');
+        html += '<div class="odds-row"><div class="odds-match">' +
+          d.home_team + ' vs ' + d.away_team + '</div><div class="odds-prices">' +
+          prices + '</div></div>';
+      });
+      el.innerHTML = html || '<p style="margin:0; color: var(--text-muted); font-size: var(--text-sm);">No odds available this week.</p>';
+    }).catch(function() {
+      el.innerHTML = '<p style="margin:0; color: var(--text-muted); font-size: var(--text-sm);">Odds unavailable right now.</p>';
+    });
+  })();
+  </script>
+
+  <footer>
+    Built 10 September 2026. Standings and fixtures via football-data.org (free tier, delayed). Everything else is Divbox's own reporting and paraphrasing of public sources.
+  </footer>
+
+</div>
+</body>
+</html>

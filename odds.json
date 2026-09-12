@@ -1,0 +1,24 @@
+{
+  "ARS": {
+    "commence_time": "2026-09-09T19:00:00Z",
+    "home_team": "Napoli",
+    "away_team": "Arsenal",
+    "bookmaker_count": 19,
+    "odds": {
+      "Arsenal": 1.75,
+      "Napoli": 4.66,
+      "Draw": 3.62
+    }
+  },
+  "MUN": {
+    "commence_time": "2026-09-10T19:00:00Z",
+    "home_team": "Manchester United",
+    "away_team": "Sabah FK",
+    "bookmaker_count": 17,
+    "odds": {
+      "Manchester United": 1.11,
+      "Sabah FK": 20.76,
+      "Draw": 9.09
+    }
+  }
+}
