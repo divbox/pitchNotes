@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Validate and persist a locked-in Pick Em submission.
 
 One JSON file per user per week: data/picks/W<week>/<user>.json. Each

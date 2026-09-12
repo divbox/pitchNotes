@@ -2,7 +2,7 @@
 
 (function () {
   var STORAGE_KEY = 'pickem_user';
-  var SUBMIT_URL = '/cgi-bin/submit-picks.py';
+  var SUBMIT_URL = '../cgi-bin/submit-picks.py';
 
   var rows = document.querySelectorAll('.pickem-row');
   var heading = document.getElementById('pickem-heading');
