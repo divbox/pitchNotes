@@ -217,7 +217,7 @@ body {{
   font-size: var(--text-base);
   line-height: 1.55;
 }}
-.wrap {{ max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }}
+.wrap {{ max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }}
 
 .masthead {{ padding: 8px 0 24px; border-bottom: 3px solid var(--color-accent); margin-bottom: 32px; }}
 .masthead .kicker {{ font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-gold); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 10px; }}

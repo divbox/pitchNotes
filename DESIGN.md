@@ -1,11 +1,10 @@
 # Design preferences
 
-Design system for Pitch Notes. This copy has been customized for this project — it's no longer the generic personal template, it's Pitch Notes as it needs to be.
+Design system for Pitch Notes.
 
 ## Philosophy
 
 - CSS custom properties (root variables) for everything — no hardcoded colors scattered through stylesheets
-- Self-contained HTML artifacts: portable, shareable, no external dependencies unless CORS is confirmed
 - Dark-only. Stadium-navy background, no light mode toggle — this is a fixed design decision, not a default awaiting an override.
 - No real team crests or logos anywhere — they're trademarked. Use flat color chips (each club's actual kit color) with 2–3 letter initials instead.
 - Status colors (green/orange/red) are semantic and fixed. Don't reassign them.
@@ -109,7 +108,13 @@ Status cells use the semantic color pair: `--color-{status}-bg` for background, 
 
 ## HTML artifacts
 
-- Self-contained single files — all CSS and JS inline, no separate files
+- Self-contained single files — all CSS and JS inline, no separate files.
+  This is the rule for the weekly newsletter itself: no build step, no
+  separate assets to keep track of, just one portable file per week.
+- Exception: the Pick Em app pages (`weeklies/pick-em.html` and friends)
+  are a small standing app that Divbox actively maintains, not a
+  one-and-done weekly artifact, so they share one stylesheet,
+  `weeklies/pickem.css`, instead of duplicating the CSS into every page.
 - Data processing: if heavy lifting is needed, do it in Python first and bake the result into the HTML. This removes the JS processing layer from the artifact and keeps the page lean.
 - API data: fetch directly from the page if CORS allows. If not, pre-process and embed.
 - Multi-tab layouts are fine when content genuinely separates into distinct views.

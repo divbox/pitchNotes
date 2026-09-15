@@ -1,0 +1,126 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.football-data.org)",
+      "WebFetch(domain:www.oddschecker.com)",
+      "WebFetch(domain:the-odds-api.com)",
+      "WebSearch",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 fetch_data.py*)",
+      "Bash(python3 fetch_odds.py*)",
+      "Bash(python3 build.py*)",
+      "Bash(python3 publish.py*)",
+      "Bash(python3 run_weekly.py*)",
+      "Bash(python3 deploy.py --dry-run)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'ls*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'cat*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'crontab -l*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'whoami*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'echo*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'pwd*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'which*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes divbox@linode.divbox.com 'python3 --version*)",
+      "Bash(ssh -p 30006 -o BatchMode=yes -o ConnectTimeout=8 divbox@linode.divbox.com 'echo connected && whoami && ls -ld /var/www/divbox.ai/public/premier-league 2>&1')",
+      "Bash(curl -s https://divbox.ai/*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://divbox.ai/premier-league/archive/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://divbox.ai/premier-league/)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(echo \"exit: $?\")",
+      "Read(//Users/divbox/.claude/skills/**)",
+      "Read(//Users/divbox/.claude/plugins/**)",
+      "Bash(find / -maxdepth 6 -iname \"*pitch-notes-weekly*\")",
+      "Bash(git mv *)",
+      "Bash(python3 scripts/run_weekly.py --demo)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(file images/*.jpg)",
+      "Bash(python3 scripts/build.py --demo)",
+      "Bash(python3 -)",
+      "Bash(sort -u -t: -k2)",
+      "Bash(awk -F: '{print $2}')",
+      "Bash(git push *)",
+      "Bash(python3 scripts/fetch_odds.py)",
+      "Bash(npm run *)",
+      "Bash(npm test)",
+      "Bash(pnpm test)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(rm -Rf *)",
+      "Bash(rm -fR *)",
+      "Bash(rm -r *)",
+      "Bash(rm -R *)",
+      "Bash(rm --recursive*)",
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "DesignSync",
+      "NotebookEdit",
+      "SendMessage",
+      "PushNotification",
+      "RemoteTrigger",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "AskUserQuestion",
+      "CronCreate",
+      "CronDelete",
+      "CronList"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Agent"
+    ]
+  },
+  "model": "claude-opus-4-8",
+  "disableClaudeAiConnectors": true,
+  "disableBundledSkills": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Claude Code initialized with lean tokens. Stay concise.'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|MultiEdit|Write|NotebookEdit|Bash|PowerShell|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run ~/.claude/hooks/pre_tool_use_secrets.py",
+            "timeout": 15,
+            "statusMessage": "Checking guardrails..."
+          }
+        ]
+      }
+    ]
+  },
+  "disableRemoteControl": true,
+  "disableWorkflows": true,
+  "disableArtifact": true,
+  "enabledPlugins": {
+    "playwright@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "theme": "dark",
+  "autoCompactEnabled": true,
+  "telemetry": false,
+  "errorReporting": false,
+  "sendFeedback": false,
+  "autoContextLimit": 15000
+}
