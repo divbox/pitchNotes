@@ -22,6 +22,7 @@ Three fonts, each with a job, from Google Fonts (allowed in this project):
 Arsenal red accent, gold trim, warm off-white ink on a dark navy ground.
 
 - Accent is Arsenal red. Gold is trim and highlights only, not a second accent.
+- Section tags (`.sec-head .tag`) use the accent.
 - Status colors are semantic and fixed: green for good, orange for warning (orange, not yellow, so it stays distinct on a dashboard), red for danger. Each has a matching background and text shade for status cells.
 - Surfaces run dark navy from the page ground up through cards and subtle panels; text runs warm off-white down through secondary and muted.
 
