@@ -11,111 +11,26 @@ Design system for Pitch Notes.
 
 ## Fonts
 
-Three fonts, each with a job: display numerals, editorial body copy, data/labels. Google Fonts is allowed in this project.
+Three fonts, each with a job, from Google Fonts (allowed in this project):
 
-```css
-@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-```
-
-```css
-:root {
-  --font-display: 'Big Shoulders Display', system-ui, sans-serif; /* headlines, scoreboard numerals */
-  --font-serif:   'Source Serif 4', Georgia, serif;                /* body / editorial copy */
-  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;       /* data, labels, tags */
-}
-```
+- Big Shoulders Display — headlines and scoreboard numerals
+- Source Serif 4 — editorial body copy
+- IBM Plex Mono — data, labels, tags
 
 ## Color palette — Stadium Navy
 
 Arsenal red accent, gold trim, warm off-white ink on a dark navy ground.
 
-```css
-:root {
-  /* Accent */
-  --color-accent:        #ef0107;   /* Arsenal red — section tags, primary accent */
-  --color-accent-bg:     #2a0a08;
-  --color-accent-text:   #ff4d43;
-  --color-gold:          #d4a94e;   /* trim / highlights only, not a second accent */
-
-  /* Surfaces */
-  --surface-page:        #060d18;
-  --surface-card:        #0a1628;
-  --surface-subtle:      #101f36;
-
-  /* Text */
-  --text-primary:        #f1ede2;
-  --text-secondary:      #b8b2a3;
-  --text-muted:          #7a7568;
-
-  /* Borders */
-  --border:              #1c2d47;
-  --border-strong:       #2a3f5c;
-
-  /* Status — semantic, adjusted for dark ground */
-  --color-success:       #16a34a;
-  --color-success-bg:    #0d2618;
-  --color-success-text:  #4ade80;
-
-  --color-warning:       #ea580c;   /* orange, not yellow — distinct from yellow on dashboards */
-  --color-warning-bg:    #2b1608;
-  --color-warning-text:  #fb923c;
-
-  --color-danger:        #dc2626;
-  --color-danger-bg:     #2a0d0d;
-  --color-danger-text:   #f87171;
-
-  /* Typography scale */
-  --text-xs:   11px;
-  --text-sm:   13px;
-  --text-base: 16px;
-  --text-lg:   18px;
-  --text-xl:   22px;
-
-  /* Spacing */
-  --radius:    8px;
-  --radius-lg: 12px;
-}
-```
+- Accent is Arsenal red. Gold is trim and highlights only, not a second accent.
+- Status colors are semantic and fixed: green for good, orange for warning (orange, not yellow, so it stays distinct on a dashboard), red for danger. Each has a matching background and text shade for status cells.
+- Surfaces run dark navy from the page ground up through cards and subtle panels; text runs warm off-white down through secondary and muted.
 
 ## Dashboard conventions
 
-For stat cards and metric displays:
-
-```css
-.stat-card {
-  background: var(--surface-card);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-label {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: var(--text-lg);
-  font-weight: 500;
-  color: var(--text-primary);
-}
-```
+Stat cards pair a small muted label with a larger primary value, in tabular numerals so columns of figures line up.
 
 Status cells use the semantic color pair: `--color-{status}-bg` for background, `--color-{status}-text` for text and label. Never mix status colors across palettes.
 
-## HTML artifacts
+## Asset system
 
-- Self-contained single files — all CSS and JS inline, no separate files.
-  This is the rule for the weekly newsletter itself: no build step, no
-  separate assets to keep track of, just one portable file per week.
-- Exception: the Pick Em app pages (`weeklies/pick-em.html` and friends)
-  are a small standing app that Divbox actively maintains, not a
-  one-and-done weekly artifact, so they share one stylesheet,
-  `weeklies/pickem.css`, instead of duplicating the CSS into every page.
-- Data processing: if heavy lifting is needed, do it in Python first and bake the result into the HTML. This removes the JS processing layer from the artifact and keeps the page lean.
-- API data: fetch directly from the page if CORS allows. If not, pre-process and embed.
-- Multi-tab layouts are fine when content genuinely separates into distinct views.
-- No external CDN dependencies unless you've confirmed they'll be available in the target environment.
+The app uses shared CSS and JS as needed. Pages pull their styling from `assets/css` and their behavior from `assets/js` rather than inlining it. The specific files in those folders can change, and nothing here pins them.
