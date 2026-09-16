@@ -1,9 +1,7 @@
 # Pitch Notes
 
-A weekly, self-hosted Premier League dashboard — a single self-contained HTML
-file covering Arsenal and Manchester United, built for a small group of
-friends. See [CLAUDE.md](CLAUDE.md) for the full project brief and
-[DESIGN.md](DESIGN.md) for the visual design system.
+A Premier League dashboard. See [CLAUDE.md](CLAUDE.md) for the full project
+brief and [DESIGN.md](DESIGN.md) for the visual design system.
 
 ## Layout
 
@@ -53,3 +51,11 @@ LINODE_USER=
 LINODE_PORT=
 LINODE_WWW_PATH=
 ```
+
+## Claude Code
+
+The maintainer's global Claude Code config (in `~/.claude`, not part of this
+repo) has a `SessionStart` hook that injects a short, read-only summary of the
+repo's current git state when a session starts here. It changes nothing, and it
+won't fire for anyone who opens this repo without that config. Script:
+`~/.claude/hooks/session_context.py`.
