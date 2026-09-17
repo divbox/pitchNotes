@@ -448,7 +448,7 @@ if __name__ == "__main__":
         data = fd.build(TOKEN)
         out = build_html(data)
         os.makedirs(WEEKLIES_DIR, exist_ok=True)
-        filename = os.path.join(WEEKLIES_DIR, f"pitch-notes-W{ct.WEEK_NUMBER}.html")
+        filename = os.path.join(WEEKLIES_DIR, f"pitch-notes-{ct.BUILD_DATE}.html")
         with open(filename, "w") as f:
             f.write(out)
         print(f"wrote {filename}")

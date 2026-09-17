@@ -1,8 +1,8 @@
 """Promote the latest built weekly HTML to the local deploy staging area.
 
-Takes the highest-numbered file in weeklies/, makes it dist/index.html, and
-if a different week was previously live, moves that one into dist/archive/
-under its original filename. Tracks the live week in manifest.json so this
+Takes the newest-dated file in weeklies/, makes it dist/index.html, and
+if a different edition was previously live, moves that one into dist/archive/
+under its original filename. Tracks the live edition in manifest.json so this
 never has to guess or reparse old content.
 
 Usage: python3 publish.py
@@ -20,20 +20,24 @@ ARCHIVE_DIR = os.path.join(DIST_DIR, "archive")
 MANIFEST = "manifest.json"
 
 
-def latest_week():
-    files = glob.glob(os.path.join(WEEKLIES_DIR, "pitch-notes-W*.html"))
-    if not files:
-        print(f"No weekly files found in {WEEKLIES_DIR}/", file=sys.stderr)
+def latest_edition():
+    files = glob.glob(os.path.join(WEEKLIES_DIR, "pitch-notes-*.html"))
+    dated = []
+    for f in files:
+        m = re.search(r"pitch-notes-(\d{4}-\d{2}-\d{2})\.html$", f)
+        if m:
+            dated.append((m.group(1), f))
+    if not dated:
+        print(f"No dated edition files found in {WEEKLIES_DIR}/", file=sys.stderr)
         sys.exit(1)
-    weeks = [(int(re.search(r"W(\d+)", f).group(1)), f) for f in files]
-    return max(weeks)
+    return max(dated)  # ISO dates sort chronologically as strings
 
 
 def load_manifest():
     if os.path.exists(MANIFEST):
         with open(MANIFEST) as f:
             return json.load(f)
-    return {"current_week": None, "current_file": None}
+    return {"current_date": None, "current_file": None}
 
 
 def save_manifest(manifest):
@@ -42,23 +46,23 @@ def save_manifest(manifest):
 
 
 def publish():
-    week, src = latest_week()
+    date, src = latest_edition()
     manifest = load_manifest()
-    current_week = manifest["current_week"]
+    current_date = manifest.get("current_date")
 
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
     index_path = os.path.join(DIST_DIR, "index.html")
 
-    if current_week is not None and current_week != week and os.path.exists(index_path):
+    if current_date is not None and current_date != date and os.path.exists(index_path):
         archived_path = os.path.join(ARCHIVE_DIR, manifest["current_file"])
         shutil.copyfile(index_path, archived_path)
-        print(f"archived week {current_week} -> {archived_path}")
+        print(f"archived {current_date} -> {archived_path}")
 
     shutil.copyfile(src, index_path)
-    manifest["current_week"] = week
+    manifest["current_date"] = date
     manifest["current_file"] = os.path.basename(src)
     save_manifest(manifest)
-    print(f"published week {week} -> {index_path}")
+    print(f"published {date} -> {index_path}")
 
 
 def demo():
@@ -74,17 +78,17 @@ def demo():
         MANIFEST = os.path.join(tmp, "manifest.json")
         os.makedirs(WEEKLIES_DIR)
 
-        with open(os.path.join(WEEKLIES_DIR, "pitch-notes-W3.html"), "w") as f:
-            f.write("week 3 content")
+        with open(os.path.join(WEEKLIES_DIR, "pitch-notes-2026-09-03.html"), "w") as f:
+            f.write("first edition")
         publish()
-        assert open(os.path.join(DIST_DIR, "index.html")).read() == "week 3 content"
+        assert open(os.path.join(DIST_DIR, "index.html")).read() == "first edition"
         assert not os.listdir(ARCHIVE_DIR), "nothing to archive on first publish"
 
-        with open(os.path.join(WEEKLIES_DIR, "pitch-notes-W4.html"), "w") as f:
-            f.write("week 4 content")
+        with open(os.path.join(WEEKLIES_DIR, "pitch-notes-2026-09-10.html"), "w") as f:
+            f.write("second edition")
         publish()
-        assert open(os.path.join(DIST_DIR, "index.html")).read() == "week 4 content"
-        assert open(os.path.join(ARCHIVE_DIR, "pitch-notes-W3.html")).read() == "week 3 content"
+        assert open(os.path.join(DIST_DIR, "index.html")).read() == "second edition"
+        assert open(os.path.join(ARCHIVE_DIR, "pitch-notes-2026-09-03.html")).read() == "first edition"
     WEEKLIES_DIR, DIST_DIR, ARCHIVE_DIR, MANIFEST = orig
     print("demo OK", file=sys.stderr)
 

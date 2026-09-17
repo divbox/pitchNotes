@@ -59,7 +59,7 @@ body {
   font-size: var(--text-base);
   line-height: 1.55;
 }
-.wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
 
 .masthead { padding: 8px 0 24px; border-bottom: 3px solid var(--color-accent); margin-bottom: 32px; }
 .masthead .kicker { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-gold); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 10px; }
@@ -146,31 +146,13 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
 @media (max-width: 480px) {
   .next-up-grid { grid-template-columns: 1fr; }
 }
-
-.masthead .kicker { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.pickem-link { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-accent); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; background: none; border: none; cursor: pointer; padding: 0; }
-.pickem-link:hover { text-decoration: underline; }
-
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(3, 7, 18, 0.75); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-.modal-overlay.open { display: flex; }
-.modal-panel { position: relative; width: 100%; max-width: 720px; max-height: 85vh; overflow-y: auto; background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 28px 24px; }
-.modal-close { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-secondary); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px; }
-.modal-close:hover { color: var(--text-primary); }
-.pickem-heading { font-family: var(--font-display); font-weight: 800; font-size: 28px; text-align: center; margin: 0 0 16px; letter-spacing: 0.01em; }
-.pickem-row { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-subtle); margin-bottom: 12px; }
-.pickem-row:last-child { margin-bottom: 0; }
-.pickem-avatar { width: 200px; height: 140px; border-radius: 10px; object-fit: cover; object-position: center top; border: 1px solid var(--border-strong); flex-shrink: 0; }
-.pickem-name-wrap { width: 100px; flex-shrink: 0; }
-.pickem-name { display: inline-block; font-family: var(--font-display); font-weight: 700; font-size: 26px; border-bottom: 2px solid var(--color-accent); padding-bottom: 2px; white-space: nowrap; }
-.pickem-divider { align-self: stretch; width: 2px; background: var(--color-accent); flex-shrink: 0; }
-.pickem-fill { flex: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 500; color: var(--color-accent); }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="masthead">
-    <p class="kicker"><span>Week 3 &middot; Premier League 2026/27</span><button type="button" class="pickem-link" id="pickem-open">Pick Em</button></p>
+    <p class="kicker">Week 3 &middot; Premier League 2026/27</p>
     <h1>PITCH NOTES<span>.</span></h1>
     <div class="meta">
       <span>10 September 2026 &middot; recap of the weekend just played</span>
@@ -195,60 +177,60 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
   <table>
     <thead><tr><th>Pos</th><th>Club</th><th>P</th><th>W-D-L</th><th>GD</th><th>Pts</th></tr></thead>
     <tbody>
-        <tr>
-          <td>1</td>
-          <td><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</td>
-          <td>3</td>
-          <td>3-0-0</td>
-          <td>+5</td>
-          <td><strong>9</strong></td>
-        </tr>
         <tr class="followed">
-          <td>2</td>
+          <td>1</td>
           <td><span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Arsenal</td>
-          <td>3</td>
-          <td>3-0-0</td>
-          <td>+5</td>
-          <td><strong>9</strong></td>
+          <td>4</td>
+          <td>4-0-0</td>
+          <td>+7</td>
+          <td><strong>12</strong></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</td>
+          <td>4</td>
+          <td>4-0-0</td>
+          <td>+6</td>
+          <td><strong>12</strong></td>
         </tr>
         <tr>
           <td>3</td>
-          <td><span class="chip" style="background:#F5A623;color:#0a1628">HUL</span> Hull City</td>
-          <td>3</td>
-          <td>2-1-0</td>
-          <td>+3</td>
-          <td><strong>7</strong></td>
+          <td><span class="chip" style="background:#4a5568;color:#f1ede2">LEE</span> Leeds United</td>
+          <td>4</td>
+          <td>2-2-0</td>
+          <td>+4</td>
+          <td><strong>8</strong></td>
         </tr>
         <tr>
           <td>4</td>
-          <td><span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Chelsea</td>
-          <td>3</td>
-          <td>2-0-1</td>
-          <td>+1</td>
-          <td><strong>6</strong></td>
+          <td><span class="chip" style="background:#F5A623;color:#0a1628">HUL</span> Hull City</td>
+          <td>4</td>
+          <td>2-2-0</td>
+          <td>+3</td>
+          <td><strong>8</strong></td>
         </tr>
         <tr>
           <td>5</td>
-          <td><span class="chip" style="background:#E30613;color:#f1ede2">BRE</span> Brentford</td>
-          <td>3</td>
-          <td>1-2-0</td>
-          <td>+3</td>
-          <td><strong>5</strong></td>
+          <td><span class="chip" style="background:#4a5568;color:#f1ede2">BHA</span> Brighton Hove</td>
+          <td>4</td>
+          <td>2-1-1</td>
+          <td>+8</td>
+          <td><strong>7</strong></td>
         </tr>
         <tr>
           <td>6</td>
-          <td><span class="chip" style="background:#C8102E;color:#f1ede2">LIV</span> Liverpool</td>
-          <td>3</td>
-          <td>1-2-0</td>
-          <td>+2</td>
-          <td><strong>5</strong></td>
+          <td><span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Chelsea</td>
+          <td>4</td>
+          <td>2-1-1</td>
+          <td>+1</td>
+          <td><strong>7</strong></td>
         </tr>
         <tr class="followed">
-          <td>11</td>
+          <td>13</td>
           <td><span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Man United</td>
-          <td>3</td>
-          <td>1-1-1</td>
-          <td>+1</td>
+          <td>4</td>
+          <td>1-1-2</td>
+          <td>+0</td>
           <td><strong>4</strong></td>
         </tr>
     </tbody>
@@ -258,11 +240,11 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
   <div class="stats-grid">
     <div class="stat-col">
       <h3>Top scorers</h3>
-      <div class="stat-row"><span>1. <span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Erling Haaland</span><span class="note">3</span></div><div class="stat-row"><span>2. <span class="chip" style="background:#C8102E;color:#f1ede2">LIV</span> Alexander Isak</span><span class="note">3</span></div><div class="stat-row followed"><span>3. <span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Bruno Fernandes</span><span class="note">3</span></div><div class="stat-row followed"><span>4. <span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Kai Havertz</span><span class="note">2</span></div><div class="stat-row followed"><span>5. <span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Bukayo Saka</span><span class="note">2</span></div>
+      <div class="stat-row"><span>1. <span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Erling Haaland</span><span class="note">4</span></div><div class="stat-row followed"><span>2. <span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Bukayo Saka</span><span class="note">3</span></div><div class="stat-row"><span>3. <span class="chip" style="background:#4a5568;color:#f1ede2">BOU</span> Marcus Tavernier</span><span class="note">3</span></div><div class="stat-row"><span>4. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> João Pedro</span><span class="note">3</span></div><div class="stat-row"><span>5. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Morgan Rogers</span><span class="note">3</span></div>
     </div>
     <div class="stat-col">
       <h3>Top assists</h3>
-      <div class="stat-row"><span>1. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> João Pedro</span><span class="note">2</span></div><div class="stat-row"><span>2. <span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Rayan Cherki</span><span class="note">2</span></div><div class="stat-row followed"><span>3. <span class="chip" style="background:#DA291C;color:#f1ede2">MUN</span> Bruno Fernandes</span><span class="note">1</span></div><div class="stat-row"><span>4. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Morgan Rogers</span><span class="note">1</span></div><div class="stat-row"><span>5. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Cole Palmer</span><span class="note">1</span></div>
+      <div class="stat-row"><span>1. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> João Pedro</span><span class="note">3</span></div><div class="stat-row"><span>2. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Cole Palmer</span><span class="note">2</span></div><div class="stat-row"><span>3. <span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Rayan Cherki</span><span class="note">2</span></div><div class="stat-row"><span>4. <span class="chip" style="background:#4a5568;color:#f1ede2">BHA</span> Pascal Groß</span><span class="note">2</span></div><div class="stat-row"><span>5. <span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Morgan Rogers</span><span class="note">1</span></div>
     </div>
   </div>
   <p class="movers-note">Assists are drawn from players who've scored at least once this season. The free data source doesn't publish a separate assists-only leaderboard, so a pure creator with zero goals wouldn't show up here.</p>
@@ -271,11 +253,11 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
   <div class="movers-grid">
     <div class="mover-col up">
       <h3>&uarr; Best start</h3>
-      <div class="mover-row"><span><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</span><span class="note">3W-0D-0L</span></div><div class="mover-row class="followed""><span><span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Arsenal</span><span class="note">3W-0D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#F5A623;color:#0a1628">HUL</span> Hull City</span><span class="note">2W-1D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#034694;color:#f1ede2">CHE</span> Chelsea</span><span class="note">2W-0D-1L</span></div>
+      <div class="mover-row class="followed""><span><span class="chip" style="background:#EF0107;color:#f1ede2">ARS</span> Arsenal</span><span class="note">4W-0D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</span><span class="note">4W-0D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">LEE</span> Leeds United</span><span class="note">2W-2D-0L</span></div><div class="mover-row"><span><span class="chip" style="background:#F5A623;color:#0a1628">HUL</span> Hull City</span><span class="note">2W-2D-0L</span></div>
     </div>
     <div class="mover-col down">
       <h3>&darr; Toughest start</h3>
-      <div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">AVL</span> Aston Villa</span><span class="note">0W-1D-2L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">TOT</span> Tottenham</span><span class="note">0W-1D-2L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">FUL</span> Fulham</span><span class="note">0W-0D-3L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">COV</span> Coventry City</span><span class="note">0W-0D-3L</span></div>
+      <div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">TOT</span> Tottenham</span><span class="note">0W-2D-2L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">FUL</span> Fulham</span><span class="note">0W-1D-3L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">AVL</span> Aston Villa</span><span class="note">0W-1D-3L</span></div><div class="mover-row"><span><span class="chip" style="background:#4a5568;color:#f1ede2">COV</span> Coventry City</span><span class="note">0W-0D-4L</span></div>
     </div>
   </div>
   <p class="movers-note">Ranked on current record, not week-over-week movement. Arsenal and Man United only show up here when their form actually puts them in the top or bottom four. Otherwise, check The Table above for where they sit.</p>
@@ -320,23 +302,23 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
   <div class="next-up-grid">
     <div class="stat-card fixture-card">
       <div class="stat-label">Premier League &middot; A</div>
-      <div class="stat-value"><span class="chip" style="background:#EB172F;color:#f1ede2">SUN</span> Sunderland</div>
-      <div class="fixture-time">Sat 12 Sep, 19:00 UTC</div>
-    </div>
-    <div class="stat-card fixture-card">
-      <div class="stat-label">Premier League &middot; A</div>
       <div class="stat-value"><span class="chip" style="background:#4a5568;color:#f1ede2">BHA</span> Brighton Hove</div>
       <div class="fixture-time">Sat 19 Sep, 14:00 UTC</div>
     </div>
     <div class="stat-card fixture-card">
       <div class="stat-label">Premier League &middot; H</div>
-      <div class="stat-value"><span class="chip" style="background:#6CABDD;color:#f1ede2">MCI</span> Man City</div>
-      <div class="fixture-time">Sun 13 Sep, 15:30 UTC</div>
+      <div class="stat-value"><span class="chip" style="background:#4a5568;color:#f1ede2">LEE</span> Leeds United</div>
+      <div class="fixture-time">Sat 10 Oct, 11:30 UTC</div>
     </div>
     <div class="stat-card fixture-card">
       <div class="stat-label">Premier League &middot; A</div>
       <div class="stat-value"><span class="chip" style="background:#4a5568;color:#f1ede2">FUL</span> Fulham</div>
       <div class="fixture-time">Sun 20 Sep, 15:30 UTC</div>
+    </div>
+    <div class="stat-card fixture-card">
+      <div class="stat-label">Premier League &middot; H</div>
+      <div class="stat-value"><span class="chip" style="background:#4a5568;color:#f1ede2">TOT</span> Tottenham</div>
+      <div class="fixture-time">Sat 10 Oct, 16:30 UTC</div>
     </div>
   </div>
 
@@ -376,50 +358,5 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
   </footer>
 
 </div>
-
-  <div class="modal-overlay" id="pickem-modal">
-    <div class="modal-panel">
-      <button type="button" class="modal-close" id="pickem-close" aria-label="Close">&times;</button>
-      <h2 class="pickem-heading">Standings</h2>
-      <div class="pickem-row">
-        <img class="pickem-avatar" src="../images/divs.jpg" alt="Divs">
-        <div class="pickem-name-wrap"><span class="pickem-name">Divs</span></div>
-        <span class="pickem-divider"></span>
-        <span class="pickem-fill">7W &ndash; 3L</span>
-      </div>
-      <div class="pickem-row">
-        <img class="pickem-avatar" src="../images/cheeky.jpg" alt="Cheeky">
-        <div class="pickem-name-wrap"><span class="pickem-name">Cheeky</span></div>
-        <span class="pickem-divider"></span>
-        <span class="pickem-fill">6W &ndash; 4L</span>
-      </div>
-      <div class="pickem-row">
-        <img class="pickem-avatar" src="../images/ll.jpg" alt="LL">
-        <div class="pickem-name-wrap"><span class="pickem-name">LL</span></div>
-        <span class="pickem-divider"></span>
-        <span class="pickem-fill">5W &ndash; 5L</span>
-      </div>
-      <div class="pickem-row">
-        <img class="pickem-avatar" src="../images/ldog.jpg" alt="L-Dog">
-        <div class="pickem-name-wrap"><span class="pickem-name">L-Dog</span></div>
-        <span class="pickem-divider"></span>
-        <span class="pickem-fill">4W &ndash; 6L</span>
-      </div>
-    </div>
-  </div>
-
-  <script>
-  (function() {
-    var openBtn = document.getElementById('pickem-open');
-    var closeBtn = document.getElementById('pickem-close');
-    var overlay = document.getElementById('pickem-modal');
-    function open() { overlay.classList.add('open'); }
-    function close() { overlay.classList.remove('open'); }
-    openBtn.addEventListener('click', open);
-    closeBtn.addEventListener('click', close);
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
-  })();
-  </script>
 </body>
 </html>
