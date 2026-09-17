@@ -7,10 +7,10 @@ brief and [DESIGN.md](DESIGN.md) for the visual design system.
 
 ```
 scripts/     pipeline scripts (see below)
-weeklies/    generated weekly HTML files (pitch-notes-W<N>.html)
+weeklies/    generated edition HTML files (pitch-notes-YYYY-MM-DD.html)
 dist/        the promoted "live" site (index.html + archive/), rsynced to the host
 logs/        pipeline run log
-manifest.json  tracks which week is currently live
+manifest.json  tracks which edition is currently live
 odds.json      local test output of fetch_odds.py (the real one runs on the host)
 ```
 

@@ -51,6 +51,10 @@ often we publish).
 
 ## Code changes to implement C
 
+Status: implemented 2026-09-16 (commit b87a87e). The two README lines that
+named the old `W<N>` scheme were fixed in the same pass; the rest of the docs
+cleanup is still deferred (see Open items).
+
 Core (the file/manifest key):
 
 - `build.py` — build the output filename from `content.py`'s `BUILD_DATE`
