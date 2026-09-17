@@ -18,7 +18,7 @@ odds.json      local test output of fetch_odds.py (the real one runs on the host
 
 Two steps, run from the project root:
 
-1. **Write this week's content** — hand-edit `scripts/content.py` (or run the
+1. **Write this edition's content** — hand-edit `scripts/content.py` (or run the
    `pitch-notes-content` skill). Research and judgment live here.
 2. **Build and publish**:
    ```bash
@@ -26,7 +26,7 @@ Two steps, run from the project root:
    ```
    Chains `build.py` (renders `content.py` + live standings/fixtures from
    football-data.org into HTML) → `publish.py` (promotes the newest
-   `weeklies/` file to `dist/index.html`, archives the outgoing week) →
+   `weeklies/` file to `dist/index.html`, archives the outgoing edition) →
    `deploy.py` (rsyncs `dist/` to the Linode host). Stops at the first
    failing step and logs to `logs/pitch-notes.log`.
 

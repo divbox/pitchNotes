@@ -95,6 +95,8 @@ Cosmetic renames (optional, do with the docs cleanup, not required for C):
     pull it as a submodule (daily, or at run time). To decide with the source.
   - `repos.txt` collects further candidate schedule repos to weigh against
     the API (or some combination of the two) when we pick.
+  - Candidate wording for the label itself: "Matchday N" (one of the repos
+    uses it, and it maps cleanly to the PL matchday concept).
 - Early Risers movers: "week-over-week" becomes "edition-over-edition" once
   cadence is irregular.
 - Docs cleanup: fold the settled cadence model into CLAUDE.md and README, and

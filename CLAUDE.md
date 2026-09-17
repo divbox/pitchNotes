@@ -59,16 +59,16 @@ Match the user's tone — casual and conversational unless the task calls for so
 - Assets and visual design (shared stylesheet + JS, theme, palette,
   fonts, dashboard component styles): see DESIGN.md, the source of
   truth. Don't redefine colors, fonts, or the asset system here.
-- Week numbering tracks the PL matchday just played, not an edition
-  count, so "Week 3" means matchday 3 just happened, not the third
-  time this has run.
+- The masthead's edition number reflects the PL matchday just played,
+  not how many times this has run. How that number is derived, and its
+  wording, is being reworked — see cadence.md.
 
 ## Pipeline
-The weekly run is two skills, deliberately split because one needs
+The run is two skills, deliberately split because one needs
 judgment and the other doesn't:
 
 - **pitch-notes-content** (research + writing, human/agent in the loop).
-  Gathers this week's Hero/Schedule Watch/Club News/Transfer
+  Gathers this edition's Hero/Schedule Watch/Club News/Transfer
   Wire/Divbox 101 material and writes it into `content.py`. Never
   touches `build.py`. A subprocess can't invoke a skill — there's no
   LLM in a script — so this step can't be folded into the mechanical
@@ -78,7 +78,7 @@ judgment and the other doesn't:
   `scripts/run_weekly.py`, which chains `build.py` (renders `content.py` +
   live standings/fixtures into HTML) → `publish.py` (promotes the
   newest `weeklies/` file to `dist/index.html`, archives the outgoing
-  week into `dist/archive/` under its original filename, tracks state
+  edition into `dist/archive/` under its original filename, tracks state
   in `manifest.json`) → `deploy.py` (rsyncs `dist/` to the Linode
   host). Stops at the first failing step, logs every run to
   `logs/pitch-notes.log`, never retries or improvises around a failure —
@@ -98,7 +98,7 @@ Odds is the one section loaded client-side rather than baked into the
 HTML at build time. It runs on the Linode host via cron, not from this
 repo's pipeline, for two reasons: the API key must never reach the
 browser, and odds want a fresher cadence (a few times a day) than the
-weekly rebuild.
+main build.
 
 - `fetch_odds.py` pulls average h2h odds from The Odds API for each
   followed club's actual next fixture (Premier League or Champions
@@ -114,11 +114,11 @@ weekly rebuild.
 
 The archive is a bare Apache directory listing on the host, not a
 generated index page. Decided deliberately: full filenames
-(pitch-notes-W<N>.html) make the raw listing self-explanatory, and a
+(pitch-notes-YYYY-MM-DD.html) make the raw listing self-explanatory, and a
 fancier generated page isn't worth building for what this is.
 
 ## Section order
-1. Masthead — week number, date, followed clubs.
+1. Masthead — edition number, date, followed clubs.
 2. Hero / Today — the day's headline story.
 3. Schedule Watch — flag any week where the normal Saturday/Sunday
    rhythm is interrupted and explain why, so a fixture gap is never
@@ -127,12 +127,12 @@ fancier generated page isn't worth building for what this is.
 5. Golden Boot Watch — league-wide top 5 scorers and top 5 assists,
    side by side. Followed-club players highlighted same as The Table.
 6. Early Risers & Strugglers — movers. Once two consecutive editions
-   exist, show real week-over-week position change; until then, form
+   exist, show real position change between them; until then, form
    only (and say so).
 7. Club News — Arsenal and Man United.
 8. The Transfer Wire — transfer rumors about the two clubs, graded
    (see Content rules).
-9. Divbox 101 — one teaching topic per week, tied to that week's biggest
+9. Divbox 101 — one teaching topic per edition, tied to that edition's biggest
    storyline (not a random rule pulled from a fixed list).
 10. Next Up — next fixtures for Arsenal and Man United specifically.
 11. The Odds — bookmaker-average odds for each followed club's next
@@ -147,7 +147,7 @@ from a paraphrased article when a structured source exists.
 - Standings and scores: use the football-data.org API (v4,
   `https://api.football-data.org/v4`), competition code `PL`. Auth via
   `X-Auth-Token` header, key stored in `.env` (`FOOTBALL_DATA_API_KEY`),
-  free tier (10 calls/min, delayed scores — fine for a weekly job).
+  free tier (10 calls/min, delayed scores — fine for an infrequent job).
   `/competitions/PL/standings` for the table, `/competitions/PL/matches`
   for fixtures/scores. Before writing any sentence describing a match,
   check its `status` field. Free tier scores are delayed, not live, so
@@ -166,7 +166,7 @@ from a paraphrased article when a structured source exists.
   in Python, baked into the HTML, not fetched client-side) — CORS isn't
   confirmed for football-data.org and the token can't sit in a page
   anyone can view-source anyway.
-- Any week with no Premier League fixture for a followed club: figure
+- Any edition where a followed club has no Premier League fixture: figure
   out why (European matchday, international break, cup round) and say
   so in Schedule Watch, sourced from official calendars (club sites,
   Premier League, UEFA) — not generic web search, which is frequently
