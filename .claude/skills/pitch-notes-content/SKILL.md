@@ -1,9 +1,9 @@
 ---
 name: pitch-notes-content
-description: Research and write this week's Pitch Notes editorial content (Hero, Schedule Watch, Club News, Transfer Wire, Divbox 101) into content.py. Use when the user asks to write, research, or update this week's Pitch Notes content, before running pitch-notes-weekly.
+description: Research and write this week's Pitch Notes editorial content (Hero, Schedule Watch, Club News, Transfer Wire, Divbox 101) into content.html. Use when the user asks to write, research, or update this week's Pitch Notes content, before running pitch-notes-weekly.
 ---
 
-Write this week's `content.py` for the Pitch Notes dashboard. This is a research-and-writing task, not a script to run — do the work directly.
+Write this week's `content.html` for the Pitch Notes dashboard. This is a research-and-writing task, not a script to run — do the work directly.
 
 ## Sources
 
@@ -24,15 +24,15 @@ Before writing any sentence about a score, fixture, or standings position, check
 
 ## Thin results are fine
 
-If research only turns up one Club News story, or zero genuine Transfer Wire items, write with what's actually there. `content.py`'s `CLUB_NEWS` list and `TRANSFER_WIRE["items"]` list both support any length, including short or empty. Do not pad with filler or manufacture a second story to fill space — that's worse than running one real story.
+If research only turns up one Club News story, or zero genuine Transfer Wire items, write with what's actually there. `content.html` takes any number of club-news and transfer blocks, including one or none. Do not pad with filler or manufacture a second story to fill space — that's worse than running one real story.
 
 ## Writing
 
 - Follow CLAUDE.md's section rules (paraphrase news in your own words, never quote more than a short attributed phrase, grade transfer rumors, note explicitly when the transfer window is closed).
-- Match `content.py`'s existing schema (`HERO`, `SCHEDULE_WATCH`, `CLUB_NEWS`, `TRANSFER_WIRE`, `DIVBOX_101`, plus `BUILD_DATE`).
+- Match `content.html`'s existing structure: one block per section tagged with `data-slot` (edition, hero, schedule, club-news, transfer-window, transfer, divbox). Prose goes in the block's inner HTML; the typed fields (build date, club TLA, rumour grade, schedule icon) are `data-*` attributes. Follow the blocks already in the file.
 - Divbox 101's topic should tie to this week's actual biggest storyline, not a rule pulled from a fixed list.
 - Run the finished prose through the `unslop` skill before considering it done.
 
 ## Scope
 
-Only touch `content.py`. Never edit `build.py`'s HTML/CSS/structure as part of this skill — that's a separate concern. When done, tell the user what changed and that `pitch-notes-weekly` is the next step whenever they're ready to publish; don't run it yourself as part of this skill.
+Only touch `content.html`. Never edit `build.py`'s HTML/CSS/structure as part of this skill — that's a separate concern. When done, tell the user what changed and that `pitch-notes-weekly` is the next step whenever they're ready to publish; don't run it yourself as part of this skill.

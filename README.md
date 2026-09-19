@@ -18,13 +18,13 @@ odds.json      local test output of fetch_odds.py (the real one runs on the host
 
 Two steps, run from the project root:
 
-1. **Write this edition's content** — hand-edit `scripts/content.py` (or run the
+1. **Write this edition's content** — hand-edit `scripts/content.html` (or run the
    `pitch-notes-content` skill). Research and judgment live here.
 2. **Build and publish**:
    ```bash
    python3 scripts/run_weekly.py
    ```
-   Chains `build.py` (renders `content.py` + live standings/fixtures from
+   Chains `build.py` (renders `content.html` + live standings/fixtures from
    football-data.org, matchday label + Golden Boot Watch from the Fantasy
    Premier League API cross-checked against openfootball, into HTML) →
    `publish.py` (promotes the newest `weeklies/` file to `dist/index.html`,

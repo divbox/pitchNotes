@@ -1,0 +1,39 @@
+<!--
+  This edition's editorial content. The prose is plain HTML and goes straight
+  into the page. The small typed fields the build needs (dates, club codes,
+  rumour grades, the schedule icon) ride along as data-* attributes on the
+  same block. build.py reads this file; it never imports it, so a mistake in
+  here can't break the build script itself.
+
+  Rewritten each edition by the pitch-notes-content step. A short list here
+  (one club-news block, zero transfer blocks) is a normal editorial outcome,
+  not an error.
+-->
+
+<div data-slot="edition" data-build-date="2026-09-19"></div>
+
+<section data-slot="hero" data-headline="So much for the perfect start">
+  <p>Arsenal went to the Amex chasing an eighth straight win to open the season, something the club hadn't managed in more than a century, and came home with their first defeat instead. Brighton were 3-0 up and cruising: Pascal Groß curled in the opener just past the half-hour, Charalampos Kostoulas made it two on the stroke of half-time, and Chema Andrés headed a third from a corner before the hour. The champions barely laid a glove on them.</p>
+  <p>The result knocks Arsenal off top spot, still level with Manchester City on points but now behind on goal difference (more on that in Divbox 101). And spare a thought for Manchester United: 13th, one win in four league games, and a manager already under fire after surrendering a two-goal lead at home to Brighton in the League Cup in midweek. Michael Carrick takes his side to Fulham on Sunday needing something, anything, to quiet the noise.</p>
+</section>
+
+<section data-slot="schedule" data-heading="Enjoy it while it lasts" data-icon="INT">This weekend keeps the normal rhythm, Arsenal on Saturday and Manchester United at Fulham on Sunday, but it's the last league football for three weeks. The September and October international breaks have been merged into one long pause this season, so once Matchweek 5 finishes on the 20th, the Premier League doesn't return until Matchweek 6 on 10 October. That's why Next Up jumps straight to October.</section>
+
+<article data-slot="club-news" data-tla="ARS" data-name="Arsenal">First defeat of the season, and not a narrow one. Arsenal had won every league game until Brighton took them apart at the Amex, and while second on 12 points is hardly a crisis, the manner of it stings: a flat afternoon from the side that had looked the most convincing in the division. The three-week break lands at a decent time and gives Arteta room to reset before Leeds visit in October.</article>
+
+<article data-slot="club-news" data-tla="MUN" data-name="Man United">A rough week for Michael Carrick. United threw away a two-goal lead at home to Brighton in the League Cup and went out, sit 13th in the league on one win in four, and travel to Fulham on Sunday with the manager's future already a talking point. The team sheet won't help: Benjamin Sesko is a doubt, while Matthijs de Ligt, Amad Diallo and Manuel Ugarte are all sidelined. Summer arrival Carlos Baleba could get his first minutes off the bench.</article>
+
+<div data-slot="transfer-window" data-note="Summer window closed 23:00 BST, 1 September, so everything below is January-window chatter. Treat it accordingly."></div>
+
+<article data-slot="transfer" data-grade="likely" data-headline="Arsenal &rarr; Andria Bartishvili (Georgian midfielder)">The teenager from last edition's wire is close to done. Fabrizio Romano says the deal is agreed and expects it signed this week, with the player travelling to London. As near to a formality as January gets.</article>
+
+<article data-slot="transfer" data-grade="likely" data-headline="Arsenal &rarr; Rio Ngumoha (Liverpool)">Romano reports Arsenal are ready to move for the Liverpool winger in 2027 if the chance opens up. Early and conditional, but a real name from a reliable source rather than back-page noise, with Ornstein separately hinting the champions want to add to the attack.</article>
+
+<article data-slot="transfer" data-grade="speculative" data-headline="Man United &rarr; Harry Kane">Graeme Bailey floated United lining up a 2027 move for the England captain, filed back in August. One reporter, and exactly the kind of marquee link a struggling side attracts. File under wishful for now.</article>
+
+<article data-slot="transfer" data-grade="speculative" data-headline="Man United &rarr; Joshua Zirkzee (possible sale)">Bailey also reckons United are open to selling Zirkzee in January. With the attack misfiring a reshuffle wouldn't shock anyone, but there's nothing firm behind it yet.</article>
+
+<section data-slot="divbox" data-heading="Goal difference, the tiebreaker that just cost Arsenal top spot">
+  <p>Arsenal and Manchester City are both sitting on 12 points. City are first, Arsenal second. The thing splitting them is goal difference: goals scored minus goals conceded across the whole season so far. City are on +6, Arsenal on +4, so City take the higher spot despite the identical points.</p>
+  <p>It's why today's 3-0 stung twice. Arsenal dropped three points they fancied taking, and their goal difference slid by three at the same time, enough to flip them from first to second in an afternoon. Two clubs can pile up the same points all season, but the one that wins big and loses small edges ahead on goal difference, and come May that quietly kept column is what separates teams level on points, at the top of the table and the bottom of it. Something to remember the next time a side keeps attacking at 4-0 up. Those extra goals aren't showing off, they're insurance.</p>
+</section>

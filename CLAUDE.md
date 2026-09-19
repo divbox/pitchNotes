@@ -73,13 +73,13 @@ judgment and the other doesn't:
 
 - **pitch-notes-content** (research + writing, human/agent in the loop).
   Gathers this edition's Hero/Schedule Watch/Club News/Transfer
-  Wire/Divbox 101 material and writes it into `content.py`. Never
+  Wire/Divbox 101 material and writes it into `content.html`. Never
   touches `build.py`. A subprocess can't invoke a skill — there's no
   LLM in a script — so this step can't be folded into the mechanical
   wrapper below; it only runs when someone (or an agent) is actually
   doing the work.
 - **pitch-notes-weekly** (mechanical, no judgment). Runs
-  `scripts/run_weekly.py`, which chains `build.py` (renders `content.py` +
+  `scripts/run_weekly.py`, which chains `build.py` (renders `content.html` +
   live standings/fixtures into HTML) → `publish.py` (promotes the
   newest `weeklies/` file to `dist/index.html`, archives the outgoing
   edition into `dist/archive/` under its original filename, tracks state

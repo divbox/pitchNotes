@@ -8,13 +8,53 @@ Usage: python3 build.py
 """
 import datetime
 import os
+import re
 import sys
-import content as ct
 import fetch_data as fd
 import fetch_fpl as ffpl
 import fetch_openfootball as fof
 
 WEEKLIES_DIR = "weeklies"
+CONTENT_PATH = os.path.join(os.path.dirname(__file__), "content.html")
+
+# Editorial content lives in content.html as prose + data-* attributes, not in
+# a .py file: a typo there can't break this build script. Each block is one
+# flat top-level element tagged with data-slot; prose is its inner HTML, typed
+# fields are its data-* attributes.
+_BLOCK_RE = re.compile(
+    r'<(section|article|div)\b([^>]*)\bdata-slot="([^"]+)"([^>]*)>(.*?)</\1>',
+    re.DOTALL,
+)
+_ATTR_RE = re.compile(r'data-([\w-]+)="([^"]*)"')
+
+
+def load_content(path=CONTENT_PATH):
+    with open(path) as f:
+        raw = f.read()
+    content = {"club_news": [], "transfer": {"window_note": "", "items": []}}
+    for tag, pre, slot, post, inner in _BLOCK_RE.findall(raw):
+        attrs = dict(_ATTR_RE.findall(pre + post))
+        inner = re.sub(r">\s+<", "><", inner.strip())
+        if slot == "edition":
+            content["build_date"] = attrs["build-date"]
+        elif slot == "hero":
+            content["hero"] = {"headline": attrs["headline"], "body": inner}
+        elif slot == "schedule":
+            content["schedule"] = {"heading": attrs["heading"], "icon": attrs["icon"], "text": inner}
+        elif slot == "club-news":
+            content["club_news"].append({"tla": attrs["tla"], "name": attrs["name"], "text": inner})
+        elif slot == "transfer-window":
+            content["transfer"]["window_note"] = attrs["note"]
+        elif slot == "transfer":
+            content["transfer"]["items"].append(
+                {"headline": attrs["headline"], "text": inner, "grade": attrs["grade"]}
+            )
+        elif slot == "divbox":
+            content["divbox"] = {"heading": attrs["heading"], "html": inner}
+    missing = [k for k in ("build_date", "hero", "schedule", "divbox") if k not in content]
+    if missing:
+        raise SystemExit(f"{path}: missing required block(s): {', '.join(missing)}")
+    return content
 
 # 2-3 letter chip color per club, approximating real kit colors (no crests/logos).
 KIT_COLORS = {
@@ -78,8 +118,7 @@ def render_scorer_list(scorers, stat_key, followed, n=5):
 
 
 def render_hero(hero):
-    paras = "".join(f"<p>{p}</p>" for p in hero["paragraphs"])
-    return f'<p class="headline">{hero["headline"]}</p>{paras}'
+    return f'<p class="headline">{hero["headline"]}</p>{hero["body"]}'
 
 
 def render_club_news(items):
@@ -120,24 +159,28 @@ def render_fixture(m, for_team_tla):
     </div>"""
 
 
-def build_html(data):
+def build_html(data, content):
     followed = {"ARS", "MUN"}
     table_html = render_table(data["table"], followed)
     movers_up, movers_down = render_movers(data["full_table"], followed)
 
-    build_date_obj = datetime.date.fromisoformat(ct.BUILD_DATE)
+    build_date_obj = datetime.date.fromisoformat(content["build_date"])
     fpl_data = ffpl.build()
     matchday = fpl_data["gameweek"]
-    cross_check = fof.current_matchday(build_date_obj)
+    # Cross-check FPL's current matchday against openfootball as of the run
+    # date, not the edition's build date -- both sources answer "what's the
+    # matchday now", and the build date can be days old.
+    today = datetime.date.today()
+    cross_check = fof.current_matchday(today)
     if cross_check is not None and cross_check != matchday:
         print(
             f"MISMATCH matchday: FPL={matchday} openfootball={cross_check} "
-            f"for {ct.BUILD_DATE} -- using FPL, flag for review",
+            f"as of {today} -- using FPL, flag for review",
             file=sys.stderr,
         )
     elif cross_check is None:
         print(
-            f"warning: could not cross-check matchday against openfootball for {ct.BUILD_DATE}",
+            f"warning: could not cross-check matchday against openfootball as of {today}",
             file=sys.stderr,
         )
 
@@ -157,20 +200,20 @@ def build_html(data):
     return TEMPLATE.format(
         matchday=matchday,
         build_date=build_date,
-        hero=render_hero(ct.HERO),
-        schedule_heading=ct.SCHEDULE_WATCH["heading"],
-        schedule_icon=ct.SCHEDULE_WATCH["icon"],
-        schedule_text=ct.SCHEDULE_WATCH["text"],
+        hero=render_hero(content["hero"]),
+        schedule_heading=content["schedule"]["heading"],
+        schedule_icon=content["schedule"]["icon"],
+        schedule_text=content["schedule"]["text"],
         table_rows=table_html,
         top_scorers=top_scorers_html,
         top_assists=top_assists_html,
         movers_up=movers_up,
         movers_down=movers_down,
-        club_news=render_club_news(ct.CLUB_NEWS),
-        window_note=ct.TRANSFER_WIRE["window_note"],
-        transfer_wire=render_transfer_wire(ct.TRANSFER_WIRE),
-        divbox_heading=ct.DIVBOX_101["heading"],
-        divbox_html=ct.DIVBOX_101["html"],
+        club_news=render_club_news(content["club_news"]),
+        window_note=content["transfer"]["window_note"],
+        transfer_wire=render_transfer_wire(content["transfer"]),
+        divbox_heading=content["divbox"]["heading"],
+        divbox_html=content["divbox"]["html"],
         next_up=next_up_html,
     )
 
@@ -464,10 +507,11 @@ if __name__ == "__main__":
         demo()
     else:
         TOKEN = fd.load_token()
+        content = load_content()
         data = fd.build(TOKEN)
-        out = build_html(data)
+        out = build_html(data, content)
         os.makedirs(WEEKLIES_DIR, exist_ok=True)
-        filename = os.path.join(WEEKLIES_DIR, f"pitch-notes-{ct.BUILD_DATE}.html")
+        filename = os.path.join(WEEKLIES_DIR, f"pitch-notes-{content['build_date']}.html")
         with open(filename, "w") as f:
             f.write(out)
         print(f"wrote {filename}")
