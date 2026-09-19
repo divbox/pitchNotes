@@ -77,7 +77,7 @@
       "Agent"
     ]
   },
-  "model": "claude-opus-4-8",
+  "model": "sonnet",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
   "hooks": {
