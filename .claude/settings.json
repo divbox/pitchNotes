@@ -87,6 +87,15 @@
             "command": "echo 'Claude Code initialized with lean tokens. Stay concise.'"
           }
         ]
+      },
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/session_context.py"
+          }
+        ]
       }
     ],
     "PreToolUse": [
