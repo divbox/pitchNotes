@@ -37,15 +37,6 @@ def top6_plus_followed(table):
     return rows
 
 
-def top_scorers(token, limit=25):
-    """Players with at least one PL goal this season, each with goals/assists/
-    penalties. This is the only player-stats resource the free tier offers --
-    there's no separate assists leaderboard, so an "assists" ranking drawn
-    from this list only covers players who've also scored."""
-    data = get(token, f"/competitions/PL/scorers?limit={limit}")
-    return data["scorers"]
-
-
 def next_fixtures(token, team_id, n=1):
     """Matches come back date-ascending with no filter; the API's own status
     filter doesn't reliably match its real status values (TIMED/SCHEDULED),
@@ -64,10 +55,8 @@ def build(token):
     standings = get(token, "/competitions/PL/standings")
     table = standings["standings"][0]["table"]
     return {
-        "matchday": standings["season"]["currentMatchday"],
         "table": top6_plus_followed(table),
         "full_table": table,
-        "scorers": top_scorers(token),
         "next_fixtures": {
             "ARS": next_fixture(token, ARSENAL_ID),
             "MUN": next_fixture(token, MAN_UTD_ID),
@@ -84,8 +73,6 @@ def demo():
     assert "ARS" in tlas and "MUN" in tlas, "Arsenal/Man Utd must appear even outside top 6"
     for club, fixture in result["next_fixtures"].items():
         assert fixture is None or fixture["status"] not in ("FINISHED", "CANCELLED", "POSTPONED"), f"{club} next fixture must be unplayed"
-    assert result["scorers"], "expected at least one scorer"
-    assert all("goals" in s and "player" in s and "team" in s for s in result["scorers"]), "scorer rows missing expected fields"
     print("demo OK", file=sys.stderr)
 
 

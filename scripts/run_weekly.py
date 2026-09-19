@@ -33,6 +33,9 @@ def run(steps):
             print(f"Stopped: {name} failed (exit {result.returncode}).", file=sys.stderr)
             print(result.stderr, file=sys.stderr)
             return result.returncode
+        if result.stderr.strip():
+            for line in result.stderr.strip().splitlines():
+                log(f"WARN {name}: {line}")
         log(f"OK {name}")
     log("SUCCESS full run")
     print("Weekly run complete.")

@@ -11,6 +11,8 @@ import os
 import sys
 import content as ct
 import fetch_data as fd
+import fetch_fpl as ffpl
+import fetch_openfootball as fof
 
 WEEKLIES_DIR = "weeklies"
 
@@ -122,8 +124,25 @@ def build_html(data):
     followed = {"ARS", "MUN"}
     table_html = render_table(data["table"], followed)
     movers_up, movers_down = render_movers(data["full_table"], followed)
-    top_scorers_html = render_scorer_list(data["scorers"], "goals", followed)
-    top_assists_html = render_scorer_list(data["scorers"], "assists", followed)
+
+    build_date_obj = datetime.date.fromisoformat(ct.BUILD_DATE)
+    fpl_data = ffpl.build()
+    matchday = fpl_data["gameweek"]
+    cross_check = fof.current_matchday(build_date_obj)
+    if cross_check is not None and cross_check != matchday:
+        print(
+            f"MISMATCH matchday: FPL={matchday} openfootball={cross_check} "
+            f"for {ct.BUILD_DATE} -- using FPL, flag for review",
+            file=sys.stderr,
+        )
+    elif cross_check is None:
+        print(
+            f"warning: could not cross-check matchday against openfootball for {ct.BUILD_DATE}",
+            file=sys.stderr,
+        )
+
+    top_scorers_html = render_scorer_list(fpl_data["scorers"], "goals", followed)
+    top_assists_html = render_scorer_list(fpl_data["scorers"], "assists", followed)
 
     ars_next = fd.next_fixtures(TOKEN, fd.ARSENAL_ID, n=2)
     mun_next = fd.next_fixtures(TOKEN, fd.MAN_UTD_ID, n=2)
@@ -133,10 +152,10 @@ def build_html(data):
         render_fixture(m, "MUN") for m in mun_next
     )
 
-    build_date = datetime.date.fromisoformat(ct.BUILD_DATE).strftime("%-d %B %Y")
+    build_date = build_date_obj.strftime("%-d %B %Y")
 
     return TEMPLATE.format(
-        week=ct.WEEK_NUMBER,
+        matchday=matchday,
         build_date=build_date,
         hero=render_hero(ct.HERO),
         schedule_heading=ct.SCHEDULE_WATCH["heading"],
@@ -161,7 +180,7 @@ TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pitch Notes — Week {week}</title>
+<title>Pitch Notes — Matchday {matchday}</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -310,7 +329,7 @@ footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--borde
 <div class="wrap">
 
   <header class="masthead">
-    <p class="kicker">Week {week} &middot; Premier League 2026/27</p>
+    <p class="kicker">Matchday {matchday} &middot; Premier League 2026/27</p>
     <h1>PITCH NOTES<span>.</span></h1>
     <div class="meta">
       <span>{build_date} &middot; recap of the weekend just played</span>
@@ -349,7 +368,7 @@ footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--borde
       {top_assists}
     </div>
   </div>
-  <p class="movers-note">Assists are drawn from players who've scored at least once this season. The free data source doesn't publish a separate assists-only leaderboard, so a pure creator with zero goals wouldn't show up here.</p>
+  <p class="movers-note">Every player carries a real goals/assists count via the Fantasy Premier League API, so a pure creator with zero goals still shows up in the assists list.</p>
 
   <div class="sec-head"><h2>Early Risers &amp; Strugglers</h2><span class="tag">Form, not rank</span></div>
   <div class="movers-grid">
@@ -413,7 +432,7 @@ footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--borde
   </script>
 
   <footer>
-    Built {build_date}. Standings and fixtures via football-data.org (free tier, delayed). Everything else is Divbox's own reporting and paraphrasing of public sources.
+    Built {build_date}. Standings and fixtures via football-data.org (free tier, delayed); matchday number and Golden Boot Watch via the Fantasy Premier League API, cross-checked against openfootball. Everything else is Divbox's own reporting and paraphrasing of public sources.
   </footer>
 
 </div>

@@ -6,7 +6,6 @@ short list here (one Club News item, zero Transfer Wire items) is a normal
 editorial outcome, not something build.py should treat as an error.
 """
 
-WEEK_NUMBER = 3  # tracks the PL matchday just played
 BUILD_DATE = "2026-09-10"  # ISO date
 
 HERO = {

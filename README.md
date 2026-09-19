@@ -25,8 +25,10 @@ Two steps, run from the project root:
    python3 scripts/run_weekly.py
    ```
    Chains `build.py` (renders `content.py` + live standings/fixtures from
-   football-data.org into HTML) → `publish.py` (promotes the newest
-   `weeklies/` file to `dist/index.html`, archives the outgoing edition) →
+   football-data.org, matchday label + Golden Boot Watch from the Fantasy
+   Premier League API cross-checked against openfootball, into HTML) →
+   `publish.py` (promotes the newest `weeklies/` file to `dist/index.html`,
+   archives the outgoing edition) →
    `deploy.py` (rsyncs `dist/` to the Linode host). Stops at the first
    failing step and logs to `logs/pitch-notes.log`.
 

@@ -29,7 +29,7 @@ If research only turns up one Club News story, or zero genuine Transfer Wire ite
 ## Writing
 
 - Follow CLAUDE.md's section rules (paraphrase news in your own words, never quote more than a short attributed phrase, grade transfer rumors, note explicitly when the transfer window is closed).
-- Match `content.py`'s existing schema (`HERO`, `SCHEDULE_WATCH`, `CLUB_NEWS`, `TRANSFER_WIRE`, `DIVBOX_101`, plus `WEEK_NUMBER` and `BUILD_DATE`).
+- Match `content.py`'s existing schema (`HERO`, `SCHEDULE_WATCH`, `CLUB_NEWS`, `TRANSFER_WIRE`, `DIVBOX_101`, plus `BUILD_DATE`).
 - Divbox 101's topic should tie to this week's actual biggest storyline, not a rule pulled from a fixed list.
 - Run the finished prose through the `unslop` skill before considering it done.
 

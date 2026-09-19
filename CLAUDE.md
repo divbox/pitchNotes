@@ -59,9 +59,13 @@ Match the user's tone — casual and conversational unless the task calls for so
 - Assets and visual design (shared stylesheet + JS, theme, palette,
   fonts, dashboard component styles): see DESIGN.md, the source of
   truth. Don't redefine colors, fonts, or the asset system here.
-- The masthead's edition number reflects the PL matchday just played,
-  not how many times this has run. How that number is derived, and its
-  wording, is being reworked — see cadence.md.
+- The masthead's edition number is the current PL matchday, labeled
+  "Matchday N". Sourced from the free Fantasy Premier League API
+  (`fantasy.premierleague.com/api/bootstrap-static/`, no key), cross-checked
+  against openfootball/england's public-domain fixture schedule
+  (`github.com/openfootball/england`) for the same season. FPL wins on a
+  disagreement — the build doesn't stop — but the mismatch is logged for
+  Div to review and fix later, not silently dropped.
 
 ## Pipeline
 The run is two skills, deliberately split because one needs
@@ -156,12 +160,18 @@ from a paraphrased article when a structured source exists.
   code `CL`, also in the free tier's 12 included competitions. Don't
   reconstruct a schedule from a news article summary if the structured
   API covers it.
-- Player goals/assists (Golden Boot Watch): same API,
-  `/competitions/PL/scorers`. This is the only player-stats resource
-  the free tier exposes — it lists players with at least one PL goal
-  this season, each with a `goals` and `assists` count. There's no
-  separate assists-only leaderboard, so ranking by `assists` from this
-  same list only covers players who've also scored; the page says so.
+- Player goals/assists (Golden Boot Watch): the Fantasy Premier League
+  public API (`fantasy.premierleague.com/api/bootstrap-static/`), not
+  football-data.org. No key required. Every player carries a real
+  `goals_scored`/`assists` count regardless of whether they've scored, so
+  the assists ranking is a genuine assists leaderboard, not a by-product
+  of a scorers-only list.
+- Current matchday (masthead label): also the Fantasy Premier League API
+  (its `events` list, the entry flagged `is_current`), cross-checked
+  against openfootball/england's fixture schedule for the same season. FPL
+  is authoritative on a disagreement; the mismatch is logged (via
+  `run_weekly.py`'s log file) for later review rather than stopping the
+  build or being silently dropped.
 - Fetch via a small Python script (per DESIGN.md: heavy lifting happens
   in Python, baked into the HTML, not fetched client-side) — CORS isn't
   confirmed for football-data.org and the token can't sit in a page

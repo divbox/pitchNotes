@@ -12,4 +12,4 @@ This does three things in order and stops at the first failure: build the HTML f
 - Run the command. Do not re-implement, re-order, or "improve" the steps inline.
 - If it exits non-zero: stop immediately. Show the user the exact stderr output and the relevant line(s) from `logs/pitch-notes.log`. Do not retry, do not attempt a fix, do not fall back to a different approach. Report the failure and wait for instructions.
 - If it exits 0: tell the user it published and give the live URL (https://divbox.ai/premier-league/).
-- Before running: check `content.py`'s `WEEK_NUMBER`/`BUILD_DATE` and prose against what week it actually is. If it looks like it's still last week's content, say so and suggest running `pitch-notes-content` first rather than publishing stale news — this script has no way to detect that itself.
+- Before running: check `content.py`'s `BUILD_DATE` and prose against what week it actually is. If it looks like it's still last week's content, say so and suggest running `pitch-notes-content` first rather than publishing stale news — this script has no way to detect that itself.
