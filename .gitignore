@@ -7,3 +7,4 @@ data/picks/
 .claude/settings.local.json
 .claude/session-note.md
 .DS_Store
+.superpowers/
