@@ -59,7 +59,7 @@ def build():
 
 
 def demo():
-    """ponytail: self-check against the real API -- free, no key, negligible cost."""
+    """Self-check against the real API -- free, no key, negligible cost."""
     result = build()
     assert 1 <= result["gameweek"] <= 38, "gameweek out of range"
     assert result["scorers"], "expected at least one player"

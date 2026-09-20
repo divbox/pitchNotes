@@ -85,7 +85,7 @@ def build(key):
 
 
 def demo():
-    """ponytail: self-check against the real API -- free tier, 2 calls, negligible cost."""
+    """Self-check against the real API -- free tier, 2 calls, negligible cost."""
     key = load_key()
     result = build(key)
     for tla in ("ARS", "MUN"):

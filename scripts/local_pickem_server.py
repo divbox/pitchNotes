@@ -11,7 +11,7 @@ Also handles POST to /premier-league/cgi-bin/submit-picks.py the same way
 Apache/CGI will in production, so pickem.js can be tested end-to-end
 without any server config.
 
-ponytail: dev tool only. The real endpoint on the Linode host is Apache
+Note: dev tool only. The real endpoint on the Linode host is Apache
 CGI calling submit_picks.py directly; this script never runs there. If the
 app ever moves to a different path/subdomain, PREFIX is the one thing that
 needs to change here (and the hardcoded paths in pickem.html/pickem.js).

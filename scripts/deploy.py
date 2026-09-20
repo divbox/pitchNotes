@@ -5,9 +5,21 @@ Usage:
   python3 deploy.py             # actually push
 
 Reads LINODE_HOST, LINODE_USER, LINODE_PORT, LINODE_WWW_PATH from .env.
+
+This is the only step that touches the live site, so it is deliberately not
+part of run_pipeline.py. Logs its outcome to the same file that script uses,
+so the log still shows the whole story of a run.
 """
+import datetime
 import subprocess
 import sys
+
+LOG = "logs/pitch-notes.log"
+
+
+def log(line):
+    with open(LOG, "a") as f:
+        f.write(f"{datetime.datetime.now().isoformat(timespec='seconds')} {line}\n")
 
 
 def load_env(path=".env"):
@@ -40,4 +52,6 @@ if __name__ == "__main__":
     cmd = build_command(env, dry_run)
     print("running:", " ".join(cmd))
     result = subprocess.run(cmd)
+    what = "deploy --dry-run" if dry_run else "deploy"
+    log(f"OK {what}" if result.returncode == 0 else f"FAILED at {what}: exit {result.returncode}")
     sys.exit(result.returncode)

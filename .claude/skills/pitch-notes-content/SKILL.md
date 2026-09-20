@@ -1,6 +1,6 @@
 ---
 name: pitch-notes-content
-description: Research and write this week's Pitch Notes editorial content (Hero, Schedule Watch, Club News, Transfer Wire, Divbox 101) into content.html. Use when the user asks to write, research, or update this week's Pitch Notes content, before running pitch-notes-weekly.
+description: Research and write this week's Pitch Notes editorial content (Hero, Schedule Watch, Club News, Transfer Wire, Divbox 101) into content.html. Use when the user asks to write, research, or update this week's Pitch Notes content, before running pitch-notes-publish.
 ---
 
 Write this week's `content.html` for the Pitch Notes dashboard. This is a research-and-writing task, not a script to run — do the work directly.
@@ -35,4 +35,4 @@ If research only turns up one Club News story, or zero genuine Transfer Wire ite
 
 ## Scope
 
-Only touch `content.html`. Never edit `build.py`'s HTML/CSS/structure as part of this skill — that's a separate concern. When done, tell the user what changed and that `pitch-notes-weekly` is the next step whenever they're ready to publish; don't run it yourself as part of this skill.
+Only touch `content.html`. Never edit `build.py`'s HTML/CSS/structure as part of this skill — that's a separate concern. When done, tell the user what changed and that `pitch-notes-publish` is the next step whenever they're ready to publish; don't run it yourself as part of this skill.

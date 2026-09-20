@@ -9,7 +9,7 @@ Runs as a CGI script under Apache in production (reads the POST body via
 CONTENT_LENGTH, writes a CGI-style response). save_picks() is also imported
 directly by scripts/local_pickem_server.py for local testing.
 
-ponytail: no auth and resubmitting just overwrites the file -- fine for a
+Note: no auth and resubmitting just overwrites the file -- fine for a
 handful of friends on the honor system. Add real auth if this ever needs to
 stop people editing each other's picks.
 """

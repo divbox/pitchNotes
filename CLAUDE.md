@@ -78,19 +78,30 @@ judgment and the other doesn't:
   LLM in a script — so this step can't be folded into the mechanical
   wrapper below; it only runs when someone (or an agent) is actually
   doing the work.
-- **pitch-notes-weekly** (mechanical, no judgment). Runs
-  `scripts/run_weekly.py`, which chains `build.py` (renders `content.html` +
+- **pitch-notes-publish** (mechanical, no judgment). Runs
+  `scripts/run_pipeline.py`, which chains `build.py` (renders `content.html` +
   live standings/fixtures into HTML) → `publish.py` (promotes the
-  newest `weeklies/` file to `dist/index.html`, archives the outgoing
+  newest `editions/` file to `dist/index.html`, archives the outgoing
   edition into `dist/archive/` under its original filename, tracks state
-  in `manifest.json`) → `deploy.py` (rsyncs `dist/` to the Linode
-  host). Stops at the first failing step, logs every run to
+  in `manifest.json`). Stops at the first failing step, logs every run to
   `logs/pitch-notes.log`, never retries or improvises around a failure —
   report it and wait.
 
+Deploying is deliberately not part of that chain. `scripts/deploy.py`
+(rsyncs `dist/` to the Linode host) is its own command, because it's the
+only step that can't be undone locally, and it always needs an explicit
+go-ahead in the moment — never inferred from an ambiguous reply, never
+carried over from an earlier deploy. Everything before it is local and
+reversible, so the built page can always be looked at first.
+
+`build.py` refuses to build an edition dated earlier than the one
+`manifest.json` says is live, since that would overwrite an already-published
+edition. Rebuilding the live edition's own date is fine and expected, that's
+iterating before publish. `--force` overrides the guard.
+
 Pipeline scripts live in `scripts/` and use paths relative to the
 project root, so always run them from there, e.g.
-`python3 scripts/run_weekly.py`.
+`python3 scripts/run_pipeline.py`.
 
 `.env` keys (local, for this repo's pipeline): `FOOTBALL_DATA_API_KEY`,
 `LINODE_HOST`, `LINODE_USER`, `LINODE_PORT`, `LINODE_WWW_PATH`. Linode
@@ -130,9 +141,12 @@ fancier generated page isn't worth building for what this is.
 4. The Table — top 6 plus Arsenal and Man United rows, highlighted.
 5. Golden Boot Watch — league-wide top 5 scorers and top 5 assists,
    side by side. Followed-club players highlighted same as The Table.
-6. Early Risers & Strugglers — movers. Once two consecutive editions
-   exist, show real position change between them; until then, form
-   only (and say so).
+6. Early Risers & Strugglers — movers. Real position change between
+   this edition and the previous one, biggest gains and biggest drops.
+   Positions come from `standings-history.json`, which `build.py` writes
+   each run, keyed by build date so rebuilding an edition replaces its own
+   entry rather than inventing a move against itself. Until a previous
+   entry exists, fall back to form only and say so on the page.
 7. Club News — Arsenal and Man United.
 8. The Transfer Wire — transfer rumors about the two clubs, graded
    (see Content rules).
@@ -152,9 +166,13 @@ from a paraphrased article when a structured source exists.
   `https://api.football-data.org/v4`), competition code `PL`. Auth via
   `X-Auth-Token` header, key stored in `.env` (`FOOTBALL_DATA_API_KEY`),
   free tier (10 calls/min, delayed scores — fine for an infrequent job).
-  `/competitions/PL/standings` for the table, `/competitions/PL/matches`
-  for fixtures/scores. Before writing any sentence describing a match,
-  check its `status` field. Free tier scores are delayed, not live, so
+  `/competitions/PL/standings` for the table, `/teams/{id}/matches`
+  for a club's fixtures/scores (that endpoint returns both PL and CL
+  matches for the club, which is how continental fixtures arrive too).
+  The standings endpoint's `matchday` filter is not available on the free
+  tier — it's silently ignored and you get the current table back — so
+  there's no way to ask this API for a historical table. Before writing
+  any sentence describing a match, check its `status` field. Free tier scores are delayed, not live, so
   a game that isn't finished never gets described as a finished result.
 - Continental fixtures (Champions League, etc.): same API, competition
   code `CL`, also in the free tier's 12 included competitions. Don't
@@ -170,7 +188,7 @@ from a paraphrased article when a structured source exists.
   (its `events` list, the entry flagged `is_current`), cross-checked
   against openfootball/england's fixture schedule for the same season. FPL
   is authoritative on a disagreement; the mismatch is logged (via
-  `run_weekly.py`'s log file) for later review rather than stopping the
+  `run_pipeline.py`'s log file) for later review rather than stopping the
   build or being silently dropped.
 - Fetch via a small Python script (per DESIGN.md: heavy lifting happens
   in Python, baked into the HTML, not fetched client-side) — CORS isn't

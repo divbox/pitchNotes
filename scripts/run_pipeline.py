@@ -1,10 +1,14 @@
-"""Run the full weekly pipeline: build -> publish -> deploy.
+"""Build an edition and stage it in dist/: build -> publish.
+
+Deliberately stops short of deploying. Both steps here are local and
+reversible; pushing to the live host is a separate, explicit command
+(scripts/deploy.py), so "let me look at it first" is always possible.
 
 Stops at the first failing step. No retries, no fallback behavior — a
 failure here means stop and report, not improvise. Logs one line per step
 to pitch-notes.log so an unattended run leaves a trace.
 
-Usage: python3 scripts/run_weekly.py (from the project root)
+Usage: python3 scripts/run_pipeline.py (from the project root)
 Exit 0 on full success; otherwise exits with the failing step's code.
 """
 import datetime
@@ -15,7 +19,6 @@ LOG = "logs/pitch-notes.log"
 STEPS = [
     ("build", ["python3", "scripts/build.py"]),
     ("publish", ["python3", "scripts/publish.py"]),
-    ("deploy", ["python3", "scripts/deploy.py"]),
 ]
 
 
@@ -37,13 +40,14 @@ def run(steps):
             for line in result.stderr.strip().splitlines():
                 log(f"WARN {name}: {line}")
         log(f"OK {name}")
-    log("SUCCESS full run")
-    print("Weekly run complete.")
+    log("SUCCESS build+publish")
+    print("Built and staged in dist/. Nothing is live yet — "
+          "run `python3 scripts/deploy.py` to push it.")
     return 0
 
 
 def demo():
-    """ponytail: verify the stop-on-first-failure logic without touching real build/publish/deploy or the real log."""
+    """Verify the stop-on-first-failure logic without touching real build/publish or the real log."""
     import tempfile
 
     global LOG

@@ -1,39 +1,157 @@
-"""Build the weekly Pitch Notes HTML dashboard.
+"""Build the Pitch Notes HTML dashboard for one edition.
 
-Pulls live data via fetch_data.py, bakes it together with this week's
+Pulls live data via fetch_data.py, bakes it together with this edition's
 hand-written editorial content (Hero, Club News, Transfer Wire, Divbox 101),
-and writes a self-contained HTML file.
+and writes editions/pitch-notes-<build-date>.html.
 
-Usage: python3 build.py
+Usage:
+  python3 build.py            # build the edition dated in content.html
+  python3 build.py --force    # rebuild an edition older than the live one
 """
 import datetime
+import html
+import json
 import os
 import re
 import sys
+from html.parser import HTMLParser
+
 import fetch_data as fd
 import fetch_fpl as ffpl
 import fetch_openfootball as fof
 
-WEEKLIES_DIR = "weeklies"
+EDITIONS_DIR = "editions"
+MANIFEST = "manifest.json"
+HISTORY = "standings-history.json"
 CONTENT_PATH = os.path.join(os.path.dirname(__file__), "content.html")
+
+
+def load_history():
+    if os.path.exists(HISTORY):
+        with open(HISTORY) as f:
+            return json.load(f)
+    return {}
+
+
+def record_positions(history, date, full_table):
+    """Snapshot this edition's full table, keyed by build date.
+
+    Keyed by date rather than appended, so rebuilding the same edition
+    replaces its own entry instead of inventing a move against itself.
+    """
+    history[date] = {r["team"]["tla"]: r["position"] for r in full_table}
+    with open(HISTORY, "w") as f:
+        json.dump(history, f, indent=2, sort_keys=True)
+
+
+def previous_positions(history, date):
+    earlier = [d for d in history if d < date]
+    return history[max(earlier)] if earlier else None
+
+
+def check_not_stale(build_date, force=False):
+    """Refuse to rebuild an edition older than the one currently live.
+
+    Rebuilding today's edition is normal -- that's iterating before publish,
+    and overwriting is the point. Building a date *earlier* than the live
+    edition means content.html wasn't refreshed first, and writing it would
+    clobber an already-published edition (which is exactly how the 10 Sept
+    edition got overwritten with 19 Sept data).
+    """
+    if force or not os.path.exists(MANIFEST):
+        return
+    with open(MANIFEST) as f:
+        current = json.load(f).get("current_date")
+    if current and build_date < current:
+        raise SystemExit(
+            f"refusing to build {build_date}: edition {current} is already live, and "
+            f"this would overwrite it.\nRefresh content.html's data-build-date "
+            f"(pitch-notes-content), or pass --force if you really mean it."
+        )
 
 # Editorial content lives in content.html as prose + data-* attributes, not in
 # a .py file: a typo there can't break this build script. Each block is one
-# flat top-level element tagged with data-slot; prose is its inner HTML, typed
+# top-level element tagged with data-slot; prose is its inner HTML, typed
 # fields are its data-* attributes.
-_BLOCK_RE = re.compile(
-    r'<(section|article|div)\b([^>]*)\bdata-slot="([^"]+)"([^>]*)>(.*?)</\1>',
-    re.DOTALL,
-)
-_ATTR_RE = re.compile(r'data-([\w-]+)="([^"]*)"')
+class _ContentParser(HTMLParser):
+    """Pull the data-slot blocks out of content.html.
+
+    Uses a real parser rather than a regex because a regex match for the
+    closing tag stops at the *first* one, so a nested <div> inside a block
+    silently truncated it and the rest of that section vanished from the page
+    with no error. Depth is tracked per block instead.
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=False)  # keep &rarr; etc. verbatim in prose
+        self.blocks = []
+        self._slot = None
+        self._tag = None
+        self._depth = 0
+        self._attrs = {}
+        self._buf = []
+
+    def handle_starttag(self, tag, attrs):
+        if self._slot is None:
+            d = dict(attrs)
+            if "data-slot" in d:
+                self._slot = d["data-slot"]
+                self._tag = tag
+                self._depth = 1
+                # attribute values arrive already unescaped; re-escape so a bare
+                # & in a headline can't land in the output as stray markup
+                self._attrs = {
+                    k[len("data-"):]: html.escape(v or "", quote=False)
+                    for k, v in d.items()
+                    if k.startswith("data-") and k != "data-slot"
+                }
+                self._buf = []
+            return
+        if tag == self._tag:
+            self._depth += 1
+        self._buf.append(self.get_starttag_text())
+
+    def handle_startendtag(self, tag, attrs):
+        if self._slot is not None:
+            self._buf.append(self.get_starttag_text())
+
+    def handle_endtag(self, tag):
+        if self._slot is None:
+            return
+        if tag == self._tag:
+            self._depth -= 1
+            if self._depth == 0:
+                self.blocks.append((self._slot, self._attrs, "".join(self._buf)))
+                self._slot = self._tag = None
+                self._buf = []
+                return
+        self._buf.append(f"</{tag}>")
+
+    def handle_data(self, data):
+        if self._slot is not None:
+            self._buf.append(data)
+
+    def handle_entityref(self, name):
+        if self._slot is not None:
+            self._buf.append(f"&{name};")
+
+    def handle_charref(self, name):
+        if self._slot is not None:
+            self._buf.append(f"&#{name};")
+
+
+def parse_blocks(raw):
+    parser = _ContentParser()
+    parser.feed(raw)
+    parser.close()
+    return parser.blocks
 
 
 def load_content(path=CONTENT_PATH):
     with open(path) as f:
         raw = f.read()
     content = {"club_news": [], "transfer": {"window_note": "", "items": []}}
-    for tag, pre, slot, post, inner in _BLOCK_RE.findall(raw):
-        attrs = dict(_ATTR_RE.findall(pre + post))
+    for slot, attrs, inner in parse_blocks(raw):
         inner = re.sub(r">\s+<", "><", inner.strip())
         if slot == "edition":
             content["build_date"] = attrs["build-date"]
@@ -93,15 +211,60 @@ def render_table(rows, followed):
     return "".join(out)
 
 
-def render_movers(full_table, followed, n=4):
-    def row(r):
+def mover_row(r, note, followed):
+    tla = r["team"]["tla"]
+    cls = " class=\"followed\"" if tla in followed else ""
+    return (
+        f'<div class="mover-row{cls}"><span>{chip(tla)} {r["team"]["shortName"]}</span>'
+        f'<span class="note">{note}</span></div>'
+    )
+
+
+def render_movers(full_table, followed, previous=None, n=4):
+    """Real position change against the previous edition, where there is one.
+
+    Until a previous edition exists there's nothing to compare against, so
+    fall back to current record and say so on the page rather than dressing
+    up the top and bottom of the table as movement (CLAUDE.md section 6).
+    """
+    if not previous:
+        return {
+            "up": "".join(mover_row(r, f"{r['won']}W-{r['draw']}D-{r['lost']}L", followed)
+                          for r in full_table[:n]),
+            "down": "".join(mover_row(r, f"{r['won']}W-{r['draw']}D-{r['lost']}L", followed)
+                            for r in full_table[-n:]),
+            "up_heading": "&uarr; Best start",
+            "down_heading": "&darr; Toughest start",
+            "tag": "Form, not rank",
+            "note": "No previous edition to compare against yet, so this is ranked on "
+                    "current record rather than movement. From the next edition on it "
+                    "shows real position change.",
+        }
+
+    moves = []
+    for r in full_table:
         tla = r["team"]["tla"]
-        note = f"{r['won']}W-{r['draw']}D-{r['lost']}L"
-        cls = " class=\"followed\"" if tla in followed else ""
-        return f'<div class="mover-row{cls}"><span>{chip(tla)} {r["team"]["shortName"]}</span><span class="note">{note}</span></div>'
-    top_html = "".join(row(r) for r in full_table[:n])
-    bottom_html = "".join(row(r) for r in full_table[-n:])
-    return top_html, bottom_html
+        if tla in previous:
+            moves.append((previous[tla] - r["position"], r))
+    moves.sort(key=lambda m: m[0], reverse=True)
+
+    def side(entries):
+        return "".join(
+            mover_row(r, f"{previous[r['team']['tla']]} &rarr; {r['position']} ({d:+d})", followed)
+            for d, r in entries
+        )
+
+    risers = [m for m in moves if m[0] > 0][:n]
+    fallers = [m for m in moves if m[0] < 0][-n:]
+    empty = '<div class="mover-row"><span class="note">Nobody moved.</span></div>'
+    return {
+        "up": side(risers) or empty,
+        "down": side(reversed(fallers)) or empty,
+        "up_heading": "&uarr; Climbing",
+        "down_heading": "&darr; Sliding",
+        "tag": "Since last edition",
+        "note": "Places gained or lost against the previous edition's table.",
+    }
 
 
 def render_scorer_list(scorers, stat_key, followed, n=5):
@@ -159,10 +322,15 @@ def render_fixture(m, for_team_tla):
     </div>"""
 
 
-def build_html(data, content):
+def build_html(token, data, content):
     followed = {"ARS", "MUN"}
     table_html = render_table(data["table"], followed)
-    movers_up, movers_down = render_movers(data["full_table"], followed)
+
+    history = load_history()
+    movers = render_movers(
+        data["full_table"], followed, previous_positions(history, content["build_date"])
+    )
+    record_positions(history, content["build_date"], data["full_table"])
 
     build_date_obj = datetime.date.fromisoformat(content["build_date"])
     fpl_data = ffpl.build()
@@ -187,8 +355,8 @@ def build_html(data, content):
     top_scorers_html = render_scorer_list(fpl_data["scorers"], "goals", followed)
     top_assists_html = render_scorer_list(fpl_data["scorers"], "assists", followed)
 
-    ars_next = fd.next_fixtures(TOKEN, fd.ARSENAL_ID, n=2)
-    mun_next = fd.next_fixtures(TOKEN, fd.MAN_UTD_ID, n=2)
+    ars_next = fd.next_fixtures(token, fd.ARSENAL_ID, n=2)
+    mun_next = fd.next_fixtures(token, fd.MAN_UTD_ID, n=2)
     next_up_html = "".join(
         render_fixture(m, "ARS") for m in ars_next
     ) + "".join(
@@ -207,8 +375,12 @@ def build_html(data, content):
         table_rows=table_html,
         top_scorers=top_scorers_html,
         top_assists=top_assists_html,
-        movers_up=movers_up,
-        movers_down=movers_down,
+        movers_up=movers["up"],
+        movers_down=movers["down"],
+        movers_up_heading=movers["up_heading"],
+        movers_down_heading=movers["down_heading"],
+        movers_tag=movers["tag"],
+        movers_note=movers["note"],
         club_news=render_club_news(content["club_news"]),
         window_note=content["transfer"]["window_note"],
         transfer_wire=render_transfer_wire(content["transfer"]),
@@ -224,149 +396,7 @@ TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pitch Notes — Matchday {matchday}</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
-:root {{
-  --font-display: 'Big Shoulders Display', system-ui, sans-serif;
-  --font-serif:   'Source Serif 4', Georgia, serif;
-  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
-
-  --color-accent:        #ef0107;
-  --color-accent-bg:     #2a0a08;
-  --color-accent-text:   #ff4d43;
-  --color-gold:          #d4a94e;
-
-  --surface-page:        #060d18;
-  --surface-card:        #0a1628;
-  --surface-subtle:      #101f36;
-
-  --text-primary:        #f1ede2;
-  --text-secondary:      #b8b2a3;
-  --text-muted:          #7a7568;
-
-  --border:              #1c2d47;
-  --border-strong:       #2a3f5c;
-
-  --color-success:       #16a34a;
-  --color-success-bg:    #0d2618;
-  --color-success-text:  #4ade80;
-
-  --color-warning:       #ea580c;
-  --color-warning-bg:    #2b1608;
-  --color-warning-text:  #fb923c;
-
-  --color-danger:        #dc2626;
-  --color-danger-bg:     #2a0d0d;
-  --color-danger-text:   #f87171;
-
-  --text-xs:   11px;
-  --text-sm:   13px;
-  --text-base: 16px;
-  --text-lg:   18px;
-  --text-xl:   22px;
-
-  --radius:    8px;
-  --radius-lg: 12px;
-}}
-
-* {{ box-sizing: border-box; }}
-body {{
-  margin: 0;
-  background: var(--surface-page);
-  color: var(--text-primary);
-  font-family: var(--font-serif);
-  font-size: var(--text-base);
-  line-height: 1.55;
-}}
-.wrap {{ max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }}
-
-.masthead {{ padding: 8px 0 24px; border-bottom: 3px solid var(--color-accent); margin-bottom: 32px; }}
-.masthead .kicker {{ font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-gold); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 10px; }}
-.masthead h1 {{ font-family: var(--font-display); font-weight: 800; font-size: clamp(38px, 9vw, 56px); line-height: 0.95; margin: 0 0 12px; letter-spacing: 0.01em; }}
-.masthead h1 span {{ color: var(--color-accent); }}
-.masthead .meta {{ display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-secondary); }}
-.masthead .meta strong {{ color: var(--text-primary); font-weight: 600; }}
-.masthead .archive-link {{ color: var(--color-accent-text); text-decoration: none; }}
-.masthead .archive-link:hover {{ text-decoration: underline; }}
-
-.sec-head {{ display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 40px 0 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }}
-.sec-head .tag {{ font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500; color: var(--color-accent); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }}
-.sec-head h2 {{ font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); margin: 0; color: var(--text-primary); }}
-
-.card {{ background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }}
-
-.hero {{ border-left: 4px solid var(--color-accent); }}
-.hero .headline {{ font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0 0 8px; }}
-.hero p {{ margin: 0 0 8px; color: var(--text-secondary); }}
-.hero p:last-child {{ margin-bottom: 0; }}
-
-.schedule-note {{ display: flex; gap: 12px; align-items: flex-start; }}
-.schedule-note .icon {{ font-family: var(--font-mono); color: var(--color-warning-text); background: var(--color-warning-bg); border-radius: 4px; padding: 2px 6px; font-size: var(--text-xs); flex-shrink: 0; }}
-
-table {{ width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }}
-thead th {{ text-align: left; color: var(--text-muted); font-weight: 500; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 8px 8px; border-bottom: 1px solid var(--border-strong); }}
-tbody td {{ padding: 9px 8px; border-bottom: 0.5px solid var(--border); }}
-tbody tr.followed {{ background: var(--surface-subtle); }}
-tbody tr.followed td:first-child {{ box-shadow: inset 3px 0 0 var(--color-accent); }}
-.chip {{ display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 500; padding: 2px 5px; border-radius: 4px; margin-right: 4px; }}
-
-.stats-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }}
-.stat-col {{ background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 6px; }}
-.stat-col h3 {{ font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 12px; color: var(--color-gold); }}
-.stat-row {{ display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-top: 0.5px solid var(--border); font-size: var(--text-sm); }}
-.stat-row:first-of-type {{ border-top: none; }}
-.stat-row.followed {{ box-shadow: inset 3px 0 0 var(--color-accent); padding-left: 6px; }}
-.stat-row .note {{ font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }}
-@media (max-width: 480px) {{ .stats-grid {{ grid-template-columns: 1fr; }} }}
-
-.movers-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }}
-.mover-col {{ background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px 6px; }}
-.mover-col h3 {{ font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 12px; }}
-.mover-col.up h3 {{ color: var(--color-success-text); }}
-.mover-col.down h3 {{ color: var(--color-danger-text); }}
-.mover-row {{ display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-top: 0.5px solid var(--border); font-size: var(--text-sm); }}
-.mover-row:first-of-type {{ border-top: none; }}
-.mover-row.followed {{ box-shadow: inset 3px 0 0 var(--color-accent); padding-left: 6px; }}
-.mover-row .note {{ font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }}
-.movers-note {{ color: var(--text-secondary); font-size: var(--text-sm); margin-top: 12px; }}
-@media (max-width: 480px) {{ .movers-grid {{ grid-template-columns: 1fr; }} }}
-
-.club-news h3 {{ font-family: var(--font-display); font-size: var(--text-lg); margin: 0 0 6px; }}
-.club-news p {{ color: var(--text-secondary); margin: 0 0 14px; }}
-.club-news .club-block:last-child p {{ margin-bottom: 0; }}
-
-.wire-item {{ display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }}
-.wire-item:last-child {{ border-bottom: none; padding-bottom: 0; }}
-.wire-item p {{ margin: 4px 0 0; color: var(--text-secondary); font-size: var(--text-sm); }}
-.grade {{ font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500; padding: 2px 8px; border-radius: 4px; white-space: nowrap; height: fit-content; }}
-.grade.speculative {{ color: var(--text-muted); border: 1px solid var(--border-strong); }}
-.grade.likely {{ color: var(--color-warning-text); background: var(--color-warning-bg); }}
-.grade.confirmed {{ color: var(--color-success-text); background: var(--color-success-bg); }}
-.window-note {{ font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); margin: 0 0 16px; }}
-
-.divbox101 p {{ color: var(--text-secondary); }}
-.divbox101 ul {{ color: var(--text-secondary); padding-left: 20px; }}
-
-.next-up-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }}
-.stat-card {{ background: var(--surface-card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; }}
-.stat-label {{ font-size: var(--text-xs); color: var(--text-muted); font-weight: 500; margin-bottom: 4px; font-family: var(--font-mono); }}
-.stat-value {{ font-size: var(--text-base); font-weight: 500; color: var(--text-primary); }}
-.fixture-time {{ font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-secondary); margin-top: 4px; }}
-
-.odds-row {{ padding: 10px 0; border-top: 0.5px solid var(--border); }}
-.odds-row:first-child {{ border-top: none; padding-top: 0; }}
-.odds-match {{ font-size: var(--text-sm); color: var(--text-primary); margin-bottom: 4px; }}
-.odds-prices {{ font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-secondary); font-variant-numeric: tabular-nums; }}
-.odds-note {{ font-size: var(--text-xs); color: var(--text-muted); margin: 10px 0 0; }}
-.odds-note a {{ color: var(--text-muted); }}
-
-footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }}
-
-@media (max-width: 480px) {{
-  .next-up-grid {{ grid-template-columns: 1fr; }}
-}}
-</style>
+<link rel="stylesheet" href="/premier-league/assets/css/styles.css">
 </head>
 <body>
 <div class="wrap">
@@ -375,7 +405,7 @@ footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--borde
     <p class="kicker">Matchday {matchday} &middot; Premier League 2026/27</p>
     <h1>PITCH NOTES<span>.</span></h1>
     <div class="meta">
-      <span>{build_date} &middot; recap of the weekend just played</span>
+      <span>{build_date}</span>
       <span>&middot;</span>
       <span>Following <strong>Arsenal</strong> &amp; <strong>Man United</strong></span>
       <span>&middot;</span>
@@ -413,18 +443,18 @@ footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--borde
   </div>
   <p class="movers-note">Every player carries a real goals/assists count via the Fantasy Premier League API, so a pure creator with zero goals still shows up in the assists list.</p>
 
-  <div class="sec-head"><h2>Early Risers &amp; Strugglers</h2><span class="tag">Form, not rank</span></div>
+  <div class="sec-head"><h2>Early Risers &amp; Strugglers</h2><span class="tag">{movers_tag}</span></div>
   <div class="movers-grid">
     <div class="mover-col up">
-      <h3>&uarr; Best start</h3>
+      <h3>{movers_up_heading}</h3>
       {movers_up}
     </div>
     <div class="mover-col down">
-      <h3>&darr; Toughest start</h3>
+      <h3>{movers_down_heading}</h3>
       {movers_down}
     </div>
   </div>
-  <p class="movers-note">Ranked on current record, not week-over-week movement. Arsenal and Man United only show up here when their form actually puts them in the top or bottom four. Otherwise, check The Table above for where they sit.</p>
+  <p class="movers-note">{movers_note} Arsenal and Man United only show up here when they're actually among the biggest movers. Otherwise, check The Table above for where they sit.</p>
 
   <div class="sec-head"><h2>Arsenal &amp; Man United</h2><span class="tag">Club News</span></div>
   <div class="card club-news">{club_news}
@@ -483,11 +513,44 @@ footer {{ margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--borde
 </html>
 """
 
-TOKEN = None
-
-
 def demo():
-    """ponytail: self-check the ranking/highlight logic against fake scorer data."""
+    """Self-check the parser, the ranking/highlight logic, and the stale-edition guard."""
+    # a nested <div> inside a block used to truncate it silently
+    nested = (
+        '<section data-slot="divbox" data-heading="Nested">'
+        '<p>before</p><div class="x"><p>inside</p></div><p>after &amp; done</p>'
+        "</section>"
+    )
+    blocks = parse_blocks(nested)
+    assert len(blocks) == 1, "expected exactly one block"
+    slot, attrs, inner = blocks[0]
+    assert slot == "divbox" and attrs["heading"] == "Nested"
+    assert "after &amp; done" in inner, "content after a nested element must survive"
+    assert inner.count("<div") == 1 and inner.count("</div>") == 1, "nested markup must round-trip"
+
+    # movers: real position change when there's a previous edition, form when there isn't
+    fake_table = [
+        {"position": i, "team": {"tla": tla, "shortName": tla}, "won": 0, "draw": 0, "lost": 0}
+        for i, tla in enumerate(["MCI", "ARS", "BHA", "BRE", "EVE", "LEE", "MUN", "FUL"], 1)
+    ]
+    first = render_movers(fake_table, {"ARS", "MUN"}, previous=None)
+    assert "No previous edition" in first["note"], "first edition must say it's form, not movement"
+    assert "Best start" in first["up_heading"]
+
+    # MUN was 2nd and is now 7th (-5); BHA was 8th and is now 3rd (+5)
+    prev = {"MCI": 1, "MUN": 2, "ARS": 3, "BRE": 4, "EVE": 5, "LEE": 6, "FUL": 7, "BHA": 8}
+    moved = render_movers(fake_table, {"ARS", "MUN"}, previous=prev)
+    assert "Since last edition" == moved["tag"]
+    assert "8 &rarr; 3 (+5)" in moved["up"], "biggest riser should lead the up column"
+    assert "2 &rarr; 7 (-5)" in moved["down"], "biggest faller should lead the down column"
+    assert moved["up"].index("BHA") < moved["up"].index("ARS"), "risers sort by size of gain"
+    assert 'class="followed"' in moved["down"], "followed clubs stay highlighted"
+
+    # a rebuild of the same date must not produce a move against itself
+    hist = {"2026-09-19": {r["team"]["tla"]: r["position"] for r in fake_table}}
+    assert previous_positions(hist, "2026-09-19") is None, "same-date rebuild has no earlier edition"
+    assert previous_positions(hist, "2026-09-26") == hist["2026-09-19"]
+
     fake_scorers = [
         {"player": {"name": "Striker"}, "team": {"tla": "ARS"}, "goals": 3, "assists": 1},
         {"player": {"name": "Poacher"}, "team": {"tla": "MCI"}, "goals": 7, "assists": 0},
@@ -499,6 +562,26 @@ def demo():
     assert 'class="stat-row followed"' in goals_html, "followed club row should be flagged"
     assists_html = render_scorer_list(fake_scorers, "assists", followed, n=2)
     assert assists_html.index("Creator") < assists_html.index("Striker"), "top assist should rank first"
+
+    # the stale-edition guard, against a scratch manifest rather than the real one
+    import tempfile
+
+    global MANIFEST
+    orig_manifest = MANIFEST
+    with tempfile.TemporaryDirectory() as tmp:
+        MANIFEST = os.path.join(tmp, "manifest.json")
+        with open(MANIFEST, "w") as f:
+            json.dump({"current_date": "2026-09-19"}, f)
+        check_not_stale("2026-09-19")  # same date: rebuilding the live edition is fine
+        check_not_stale("2026-09-26")  # newer date: fine
+        check_not_stale("2026-09-10", force=True)  # older, but forced
+        try:
+            check_not_stale("2026-09-10")
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError("should refuse to rebuild an edition older than the live one")
+    MANIFEST = orig_manifest
     print("demo OK", file=sys.stderr)
 
 
@@ -506,12 +589,13 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--demo":
         demo()
     else:
-        TOKEN = fd.load_token()
         content = load_content()
-        data = fd.build(TOKEN)
-        out = build_html(data, content)
-        os.makedirs(WEEKLIES_DIR, exist_ok=True)
-        filename = os.path.join(WEEKLIES_DIR, f"pitch-notes-{content['build_date']}.html")
+        check_not_stale(content["build_date"], force="--force" in sys.argv)
+        token = fd.load_token()
+        data = fd.build(token)
+        out = build_html(token, data, content)
+        os.makedirs(EDITIONS_DIR, exist_ok=True)
+        filename = os.path.join(EDITIONS_DIR, f"pitch-notes-{content['build_date']}.html")
         with open(filename, "w") as f:
             f.write(out)
         print(f"wrote {filename}")

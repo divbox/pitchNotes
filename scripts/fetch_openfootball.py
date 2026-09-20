@@ -75,7 +75,7 @@ def current_matchday(target_date):
 
 
 def demo():
-    """ponytail: parse the real file, check known matchday boundaries."""
+    """Parse the real file, check known matchday boundaries."""
     text = fetch_season_text(2026)
     assert matchday_for_date(text, datetime.date(2026, 8, 21), 2026) == 1, \
         "season opener should be Matchday 1"

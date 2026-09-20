@@ -35,3 +35,10 @@ Status cells use the semantic color pair: `--color-{status}-bg` for background, 
 ## Asset system
 
 The app uses shared CSS and JS as needed. Pages pull their styling from `assets/css` and their behavior from `assets/js` rather than inlining it. The specific files in those folders can change, and nothing here pins them.
+
+Two practical consequences, both deliberate:
+
+- Links are site-absolute (`/premier-league/assets/css/styles.css`), not relative. Archived editions live a directory deeper than the live index, and a relative path would break for them.
+- `publish.py` copies `assets/` into `dist/` as part of assembling the deployable, because `deploy.py` syncs `dist/` and nothing else. Anything a page needs has to end up in `dist/`.
+
+Because editions link the stylesheet rather than embedding it, a CSS change restyles every past edition in the archive too. That's the accepted trade for having one source of truth: the archive is a record of what was written, not of what it looked like.

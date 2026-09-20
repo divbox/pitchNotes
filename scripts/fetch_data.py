@@ -52,27 +52,27 @@ def next_fixture(token, team_id):
 
 
 def build(token):
+    """Standings only. Fixtures are fetched separately by whoever needs them
+    (build.py asks for 2 per club), so this doesn't spend API calls on a
+    next-fixture lookup its caller is going to redo anyway."""
     standings = get(token, "/competitions/PL/standings")
     table = standings["standings"][0]["table"]
     return {
         "table": top6_plus_followed(table),
         "full_table": table,
-        "next_fixtures": {
-            "ARS": next_fixture(token, ARSENAL_ID),
-            "MUN": next_fixture(token, MAN_UTD_ID),
-        },
     }
 
 
 def demo():
-    """ponytail: self-check against real API — free tier, one call, negligible cost."""
+    """Self-check against the real API — free tier, a few calls, negligible cost."""
     token = load_token()
     result = build(token)
     assert 6 <= len(result["table"]) <= 8, "expected top 6 plus up to 2 followed clubs"
     tlas = [row["team"]["tla"] for row in result["table"]]
     assert "ARS" in tlas and "MUN" in tlas, "Arsenal/Man Utd must appear even outside top 6"
-    for club, fixture in result["next_fixtures"].items():
-        assert fixture is None or fixture["status"] not in ("FINISHED", "CANCELLED", "POSTPONED"), f"{club} next fixture must be unplayed"
+    for club, team_id in (("ARS", ARSENAL_ID), ("MUN", MAN_UTD_ID)):
+        for fixture in next_fixtures(token, team_id, n=2):
+            assert fixture["status"] not in ("FINISHED", "CANCELLED", "POSTPONED"), f"{club} next fixture must be unplayed"
     print("demo OK", file=sys.stderr)
 
 
