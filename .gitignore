@@ -8,3 +8,4 @@ data/picks/
 .claude/session-note.md
 .DS_Store
 .superpowers/
+.playwright-mcp/
