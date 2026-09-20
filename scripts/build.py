@@ -21,8 +21,8 @@ import fetch_fpl as ffpl
 import fetch_openfootball as fof
 
 EDITIONS_DIR = "editions"
-MANIFEST = "manifest.json"
-HISTORY = "standings-history.json"
+MANIFEST = os.path.join("data", "manifest.json")
+HISTORY = os.path.join("data", "standings-history.json")
 CONTENT_PATH = os.path.join(os.path.dirname(__file__), "content.html")
 
 

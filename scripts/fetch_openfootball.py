@@ -35,6 +35,9 @@ def season_start_year(d):
 def fetch_season_text(start_year):
     season = f"{start_year}-{str(start_year + 1)[-2:]}"
     url = f"{RAW_BASE}/{season}/1-premierleague.txt"
+    # Browser UA instead of urllib's default -- insurance against UA filtering
+    # on a public endpoint; no recorded failure behind it (default UA worked
+    # when checked 2026-09-20).
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req) as r:
         return r.read().decode()
@@ -69,7 +72,7 @@ def current_matchday(target_date):
     start_year = season_start_year(target_date)
     try:
         text = fetch_season_text(start_year)
-    except (urllib.error.URLError, OSError):
+    except (urllib.error.URLError, OSError, UnicodeDecodeError):
         return None
     return matchday_for_date(text, target_date, start_year)
 

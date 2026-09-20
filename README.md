@@ -10,9 +10,11 @@ scripts/     pipeline scripts (see below)
 editions/    generated edition HTML files (pitch-notes-YYYY-MM-DD.html)
 dist/        the promoted "live" site (index.html + archive/), rsynced to the host
 logs/        pipeline run log
-manifest.json  tracks which edition is currently live
-standings-history.json  each edition's full table, for Early Risers & Strugglers
-odds.json      local test output of fetch_odds.py (the real one runs on the host)
+data/        pipeline state (manifest.json = which edition is live;
+             standings-history.json = each edition's table, for Early Risers
+             & Strugglers; picks/ = Pick 'Em, gitignored)
+odds.json    local test output of fetch_odds.py (the real one runs on the host,
+             and the page fetches it from the web root, so it stays put)
 ```
 
 ## Pipeline

@@ -83,7 +83,7 @@ judgment and the other doesn't:
   live standings/fixtures into HTML) → `publish.py` (promotes the
   newest `editions/` file to `dist/index.html`, archives the outgoing
   edition into `dist/archive/` under its original filename, tracks state
-  in `manifest.json`). Stops at the first failing step, logs every run to
+  in `data/manifest.json`). Stops at the first failing step, logs every run to
   `logs/pitch-notes.log`, never retries or improvises around a failure —
   report it and wait.
 
@@ -95,7 +95,7 @@ carried over from an earlier deploy. Everything before it is local and
 reversible, so the built page can always be looked at first.
 
 `build.py` refuses to build an edition dated earlier than the one
-`manifest.json` says is live, since that would overwrite an already-published
+`data/manifest.json` says is live, since that would overwrite an already-published
 edition. Rebuilding the live edition's own date is fine and expected, that's
 iterating before publish. `--force` overrides the guard.
 
@@ -143,7 +143,7 @@ fancier generated page isn't worth building for what this is.
    side by side. Followed-club players highlighted same as The Table.
 6. Early Risers & Strugglers — movers. Real position change between
    this edition and the previous one, biggest gains and biggest drops.
-   Positions come from `standings-history.json`, which `build.py` writes
+   Positions come from `data/standings-history.json`, which `build.py` writes
    each run, keyed by build date so rebuilding an edition replaces its own
    entry rather than inventing a move against itself. Until a previous
    entry exists, fall back to form only and say so on the page.

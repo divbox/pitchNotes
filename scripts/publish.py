@@ -2,7 +2,7 @@
 
 Takes the newest-dated file in editions/, makes it dist/index.html, and
 if a different edition was previously live, moves that one into dist/archive/
-under its original filename. Tracks the live edition in manifest.json so this
+under its original filename. Tracks the live edition in data/manifest.json so this
 never has to guess or reparse old content.
 
 Also copies assets/ into dist/assets/, because pages link the shared
@@ -23,7 +23,7 @@ EDITIONS_DIR = "editions"
 ASSETS_DIR = "assets"
 DIST_DIR = "dist"
 ARCHIVE_DIR = os.path.join(DIST_DIR, "archive")
-MANIFEST = "manifest.json"
+MANIFEST = os.path.join("data", "manifest.json")
 
 
 def latest_edition():

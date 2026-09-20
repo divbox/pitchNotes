@@ -20,6 +20,9 @@ BASE = "https://fantasy.premierleague.com/api"
 
 
 def get(path):
+    # Browser UA instead of urllib's default -- insurance against UA filtering
+    # on a public endpoint; no recorded failure behind it (default UA worked
+    # when checked 2026-09-20).
     req = urllib.request.Request(BASE + path, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req) as r:
         return json.load(r)
