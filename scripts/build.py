@@ -396,6 +396,7 @@ TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pitch Notes — Matchday {matchday}</title>
+<link rel="icon" type="image/svg+xml" href="/premier-league/assets/favicon.svg">
 <link rel="stylesheet" href="/premier-league/assets/css/styles.css">
 </head>
 <body>
