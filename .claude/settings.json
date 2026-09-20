@@ -8,6 +8,8 @@
       "Bash(python3 -c ' *)",
       "Bash(python3 scripts/fetch_data.py*)",
       "Bash(python3 scripts/fetch_odds.py*)",
+      "Bash(python3 scripts/fetch_fpl.py*)",
+      "Bash(python3 scripts/fetch_openfootball.py*)",
       "Bash(python3 scripts/build.py*)",
       "Bash(python3 scripts/publish.py*)",
       "Bash(python3 scripts/run_pipeline.py*)",
