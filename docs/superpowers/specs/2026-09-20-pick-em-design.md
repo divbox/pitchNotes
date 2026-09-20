@@ -102,8 +102,10 @@ is missing, the fixture still renders and the pick still scores.
 
 Three host-side cron jobs, one page, one endpoint.
 
-**Fixtures job.** Asks football-data.org for the current matchday's ten
-matches and writes `feeds/fixtures.json`.
+**Fixtures job.** Asks FPL for the current gameweek number and its deadline,
+then asks football-data.org for that matchday's ten matches, and writes both
+into `feeds/fixtures.json`. It is the only component that talks to either
+source; the page and the endpoint read the file it produces.
 
 **Odds job.** Today's `fetch_odds.py`, extended to join prices onto those
 fixtures by TLA and write `feeds/pickem-odds.json`. Continues to write
