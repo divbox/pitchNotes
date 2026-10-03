@@ -2,6 +2,8 @@
 __pycache__/
 *.pyc
 dist/
+fails/
+audit/
 logs/*.log
 data/picks/
 .claude/settings.local.json
