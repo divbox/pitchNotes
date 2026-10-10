@@ -20,7 +20,7 @@ Use general web search too, especially for transfer rumors that don't have one o
 
 ## Non-negotiable: verify against the data, not the article
 
-Before writing any sentence about a score, fixture, or standings position, check it against `scripts/fetch_data.py`'s output (run `python3 -c "import sys; sys.path.insert(0, 'scripts'); import fetch_data as fd; import json; print(json.dumps(fd.build(fd.load_token()), indent=2))"` or similar, from the project root). Search results and news articles are frequently stale on scores — never state a result or standing that contradicts the API. If something can't be verified this way and it's a schedule/score/standings claim, stop and ask rather than guessing (this is CLAUDE.md's non-negotiable rule, not a suggestion).
+Before writing any sentence about a score, fixture, or standings position, check it against `scripts/fetch_data.py`'s output (run `python3 -c "import sys; sys.path.insert(0, 'scripts'); import fetch_data as fd; import json; print(json.dumps(fd.build(fd.load_token()), indent=2))"` or similar, from the project root). Search results and news articles are frequently stale on scores — never state a result or standing that contradicts the API. If something can't be verified this way and it's a schedule/score/standings claim, stop and ask rather than guessing.
 
 A match in progress is not a reason to stop or wait. Write the edition with the API's current score and say in the prose that the match is still in play.
 
@@ -30,7 +30,7 @@ If research only turns up one Club News story, or zero genuine Transfer Wire ite
 
 ## Writing
 
-- Follow CLAUDE.md's section rules (paraphrase news in your own words, never quote more than a short attributed phrase, grade transfer rumors, note explicitly when the transfer window is closed).
+- Paraphrase news in your own words, never quote more than a short attributed phrase, grade transfer rumors Confirmed, Likely or Speculative, and note explicitly when the transfer window is closed.
 - Match `content.html`'s existing structure: one block per section tagged with `data-slot` (edition, hero, schedule, club-news, transfer-window, transfer, divbox). Prose goes in the block's inner HTML; the typed fields (build date, club TLA, rumour grade, schedule icon) are `data-*` attributes. Follow the blocks already in the file.
 - Divbox 101's topic should tie to this week's actual biggest storyline, not a rule pulled from a fixed list.
 - Run the finished prose through the `unslop` skill before considering it done.
