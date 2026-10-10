@@ -11,4 +11,4 @@
 ## 📋 CONTEXT ROUTING
 Do not guess the architecture, data rules, section orders, or deployment commands. You must read the source of truth files before acting:
 - **For Visual Design, Themes, and Stylesheets:** Read `DESIGN.md`.
-- **For APIs, Data Rules, Pipelines, and Section Orders:** Read `project.md`.
+- **For APIs, Data Rules, Pipelines, and Section Orders:** Read `PROJECT.md`.
