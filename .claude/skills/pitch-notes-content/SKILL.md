@@ -22,6 +22,8 @@ Use general web search too, especially for transfer rumors that don't have one o
 
 Before writing any sentence about a score, fixture, or standings position, check it against `scripts/fetch_data.py`'s output (run `python3 -c "import sys; sys.path.insert(0, 'scripts'); import fetch_data as fd; import json; print(json.dumps(fd.build(fd.load_token()), indent=2))"` or similar, from the project root). Search results and news articles are frequently stale on scores — never state a result or standing that contradicts the API. If something can't be verified this way and it's a schedule/score/standings claim, stop and ask rather than guessing (this is CLAUDE.md's non-negotiable rule, not a suggestion).
 
+A match in progress is not a reason to stop or wait. Write the edition with the API's current score and say in the prose that the match is still in play.
+
 ## Thin results are fine
 
 If research only turns up one Club News story, or zero genuine Transfer Wire items, write with what's actually there. `content.html` takes any number of club-news and transfer blocks, including one or none. Do not pad with filler or manufacture a second story to fill space — that's worse than running one real story.
