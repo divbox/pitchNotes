@@ -3,7 +3,7 @@ name: pitch-notes-content
 description: Research and write this week's Pitch Notes editorial content (Hero, Schedule Watch, Club News, Transfer Wire, Divbox 101) into content.html. Use when the user asks to write, research, or update this week's Pitch Notes content, before running pitch-notes-publish.
 ---
 
-Write this week's `content.html` for the Pitch Notes dashboard. This is a research-and-writing task, not a script to run — do the work directly.
+Write this week's `scripts/content.html` for the Pitch Notes dashboard. This is a research-and-writing task, not a script to run — do the work directly.
 
 ## Sources
 
@@ -20,7 +20,22 @@ Use general web search too, especially for transfer rumors that don't have one o
 
 ## Non-negotiable: verify against the data, not the article
 
-Before writing any sentence about a score, fixture, or standings position, check it against `scripts/fetch_data.py`'s output (run `python3 -c "import sys; sys.path.insert(0, 'scripts'); import fetch_data as fd; import json; print(json.dumps(fd.build(fd.load_token()), indent=2))"` or similar, from the project root). Search results and news articles are frequently stale on scores — never state a result or standing that contradicts the API. If something can't be verified this way and it's a schedule/score/standings claim, stop and ask rather than guessing.
+Before writing any sentence about a score, fixture, or standings position, check it against the API, from the project root:
+
+```
+python3 -c "
+import sys; sys.path.insert(0, 'scripts'); import fetch_data as fd
+t = fd.load_token()
+for r in fd.build(t)['full_table']: print(r['position'], r['team']['tla'], r['playedGames'], r['points'], r['goalsFor'], r['goalsAgainst'])
+for tid in (fd.ARSENAL_ID, fd.MAN_UTD_ID):
+    for m in fd.get(t, f'/teams/{tid}/matches')['matches']:
+        s = m['score']['fullTime']; print(m['utcDate'], m['competition']['code'], m['status'], m['homeTeam']['tla'], s['home'], s['away'], m['awayTeam']['tla'])
+"
+```
+
+Times are UTC. For other clubs' results, use `fd.get(t, '/competitions/PL/matches?matchday=N')`.
+
+Search results and news articles are frequently stale on scores — never state a result or standing that contradicts the API. If something can't be verified this way and it's a schedule/score/standings claim, stop and ask rather than guessing.
 
 A match in progress is not a reason to stop or wait. Write the edition with the API's current score and say in the prose that the match is still in play.
 
@@ -37,4 +52,4 @@ If research only turns up one Club News story, or zero genuine Transfer Wire ite
 
 ## Scope
 
-Only touch `content.html`. Never edit `build.py`'s HTML/CSS/structure as part of this skill — that's a separate concern. When done, tell the user what changed and that `pitch-notes-publish` is the next step whenever they're ready to publish; don't run it yourself as part of this skill.
+Only touch `scripts/content.html`. Never edit `build.py`'s HTML/CSS/structure as part of this skill — that's a separate concern. When done, tell the user what changed and that `pitch-notes-publish` is the next step whenever they're ready to publish; don't run it yourself as part of this skill.

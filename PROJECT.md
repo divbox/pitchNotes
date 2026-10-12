@@ -19,6 +19,6 @@ The key names are listed under Setup in `README.md`.
   and says why.
 
 ## Watch out
-- Building overwrites the edition for the date in `content.html`, and that
+- Building overwrites the edition for the date in `scripts/content.html`, and that
   date's entry in `data/standings-history.json`. Change the date first.
 - A match in play counts as "upcoming" in Next Up.
