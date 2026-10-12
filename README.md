@@ -19,28 +19,29 @@ odds.json    local test output of fetch_odds.py (the real one runs on the host,
 
 ## Pipeline
 
-Three steps, run from the project root:
+Two steps, run from the project root:
 
 1. **Write this edition's content.** Hand-edit `scripts/content.html` or run the
    `pitch-notes-content` skill. Research and judgment live here.
-2. **Build and stage**:
+2. **Build, stage and deploy.** Type `/pitch-notes-publish` in Claude Code, or
+   run it by hand:
    ```bash
    python3 scripts/run_pipeline.py
    ```
-   Runs `build.py`, then `publish.py`. `build.py` renders `content.html` plus
-   live data into `editions/`. `publish.py` promotes the newest edition to
-   `dist/index.html` and archives the outgoing one. The run stops at the first
-   failing step and logs to `logs/pitch-notes.log`. Nothing is live at the end
-   of this.
+   Runs `build.py`, `publish.py`, then `deploy.py`. `build.py` renders
+   `content.html` plus live data into `editions/`. `publish.py` promotes the
+   newest edition to `dist/index.html` and archives the outgoing one.
+   `deploy.py` pushes `dist/` to the Linode host, so the edition is live when
+   the run ends. The run stops at the first failing step and logs to
+   `logs/pitch-notes.log`.
 
    `build.py` refuses to build an edition dated earlier than the one already
    live, since that would overwrite a published edition. If you hit that, it
    means `content.html` wasn't refreshed. `--force` overrides it.
-3. **Deploy** (the only step that touches the live site, so it's separate and
-   deliberate):
+
+   To see what a deploy would change without pushing anything:
    ```bash
-   python3 scripts/deploy.py --dry-run   # see what would change
-   python3 scripts/deploy.py             # push dist/ to the Linode host
+   python3 scripts/deploy.py --dry-run
    ```
 
 ### Odds

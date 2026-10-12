@@ -6,10 +6,8 @@ fetch_data.py's next_fixtures logic, which isn't PL-only either).
 
 Usage: python3 fetch_odds.py
 
-Requires ODDS_API_KEY in .env. Writes to ODDS_OUTPUT_PATH if set in .env,
-else ./odds.json. This is the script meant to run via cron on the Linode
-host, independent of the weekly build/publish/deploy pipeline -- see
-CLAUDE.md's Pipeline section.
+Writes to ODDS_OUTPUT_PATH if set, else ./odds.json. Runs via cron on the
+Linode host, not in the build pipeline.
 """
 import json
 import os

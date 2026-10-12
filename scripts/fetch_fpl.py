@@ -7,8 +7,7 @@ Two things come out of one call to bootstrap-static:
   which drives the masthead "Matchday N" label (cross-checked against
   fetch_data.py).
 - elements -> every player's goals_scored/assists, not just players who've
-  scored -- this is what football-data.org's /scorers can't give you, see
-  CLAUDE.md Data rules.
+  scored -- this is what football-data.org's /scorers can't give you
 
 Usage: python3 fetch_fpl.py
 """

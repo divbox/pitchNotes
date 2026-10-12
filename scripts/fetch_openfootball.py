@@ -1,8 +1,6 @@
 """Cross-check the current PL matchday against openfootball/england's
 plain-text season schedule (public domain, no key -- confirmed reachable
-without auth). A second, independent source so fetch_fpl.py's gameweek
-number is never trusted alone for something CLAUDE.md's data rules treat
-as a schedule fact.
+without auth). A second, independent source for fetch_fpl.py's gameweek number.
 
 Format reference (one block per matchday, exactly 2-space-indented date
 lines, year only stated where it changes -- confirmed against the live

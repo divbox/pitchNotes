@@ -66,7 +66,7 @@ def check_not_stale(build_date, force=False):
         raise SystemExit(
             f"refusing to build {build_date}: edition {current} is already live, and "
             f"this would overwrite it.\nRefresh content.html's data-build-date "
-            f"(pitch-notes-content), or pass --force if you really mean it."
+            f"(pitch-notes-content), or pass --force"
         )
 
 # Editorial content lives in content.html as prose + data-* attributes, not in
@@ -225,7 +225,7 @@ def render_movers(full_table, followed, previous=None, n=4):
 
     Until a previous edition exists there's nothing to compare against, so
     fall back to current record and say so on the page rather than dressing
-    up the top and bottom of the table as movement (CLAUDE.md section 6).
+    up the top and bottom of the table as movement.
     """
     if not previous:
         return {

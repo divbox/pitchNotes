@@ -1,7 +1,6 @@
 """Pull PL standings + Arsenal/Man Utd next fixtures from football-data.org.
 
 Usage: python3 fetch_data.py > data.json
-Requires FOOTBALL_DATA_API_KEY in .env (see CLAUDE.md Data rules).
 """
 import json
 import sys

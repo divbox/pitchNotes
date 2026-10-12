@@ -4,11 +4,9 @@ Usage:
   python3 deploy.py --dry-run   # show what would change, touches nothing remote
   python3 deploy.py             # actually push
 
-Reads LINODE_HOST, LINODE_USER, LINODE_PORT, LINODE_WWW_PATH from .env.
-
-This is the only step that touches the live site, so it is deliberately not
-part of run_pipeline.py. Logs its outcome to the same file that script uses,
-so the log still shows the whole story of a run.
+This is the only step that touches the live site. run_pipeline.py runs it
+last. Logs its outcome to the same file that script uses, so the log still
+shows the whole story of a run.
 """
 import datetime
 import subprocess
